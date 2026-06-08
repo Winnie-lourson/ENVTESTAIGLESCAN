@@ -286,6 +286,8 @@ button:active {
     top: 15px;
 
     left: 15px;
+
+    text-decoration: none !important;
 }
 
 .btn-retour {
