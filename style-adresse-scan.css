@@ -1,0 +1,607 @@
+/* ========================================
+   RESET
+======================================== */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,
+body{
+
+    width:100%;
+    min-height:100vh;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc 0%,
+            #eef2f7 100%
+        );
+
+    color:#0f172a;
+}
+
+/* ========================================
+   TITRES
+======================================== */
+
+h1{
+
+    text-align:center;
+
+    font-size:56px;
+
+    font-weight:800;
+
+    letter-spacing:2px;
+
+    color:#0f2d62;
+
+    margin-top:40px;
+
+    margin-bottom:10px;
+}
+
+h2{
+
+    text-align:center;
+
+    font-size:22px;
+
+    color:#64748b;
+
+    font-weight:600;
+
+    margin-bottom:25px;
+}
+
+/* ========================================
+   NAVIGATION
+======================================== */
+
+.btn-accueil,
+.btn-retour{
+
+    position:fixed;
+
+    z-index:999;
+}
+
+.btn-accueil{
+
+    top:15px;
+
+    left:15px;
+}
+
+.btn-retour{
+
+    top:15px;
+
+    left:160px;
+}
+
+.btn-accueil button,
+.btn-retour button{
+
+    min-height:52px;
+
+    padding:0 18px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f2d62,
+            #1e40af
+        );
+
+    color:white;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:12px;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.btn-accueil button:hover,
+.btn-retour button:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 8px 18px rgba(0,0,0,.15);
+}
+
+/* ========================================
+   INFOS
+======================================== */
+
+.btn-infos {
+
+    position: fixed;
+
+    top: 15px;
+
+    right: 15px;
+
+    z-index: 999;
+
+    width: 52px;
+
+    height: 52px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f2d62,
+            #1e40af
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    box-shadow:
+        0 6px 16px rgba(0,0,0,0.12);
+}
+
+.btn-infos img {
+
+    width: 30px;
+
+    height: 30px;
+
+    object-fit: contain;
+}
+
+
+/* ========================================
+   ICÔNES
+======================================== */
+
+.logo-action{
+
+    width:18px;
+    height:18px;
+
+    object-fit:contain;
+}
+
+.logo-bouton{
+
+    width:18px;
+    height:18px;
+
+    object-fit:contain;
+
+    margin-left:auto;
+}
+
+/* ========================================
+   CARTE PRINCIPALE
+======================================== */
+
+.zone-scan{
+
+    width:95%;
+
+    max-width:1200px;
+
+    margin:30px auto;
+
+    padding:35px;
+
+    background:
+        rgba(255,255,255,.85);
+
+    backdrop-filter:blur(12px);
+
+    border-radius:28px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.08);
+}
+
+/* ========================================
+   BANDEAUX INFOS
+======================================== */
+
+#infos,
+#infos-compteur{
+
+    display:flex;
+
+    width:fit-content;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-left:auto;
+
+    margin-right:auto;
+
+    padding:10px 20px;
+
+    border-radius:999px;
+
+    background:
+        rgba(37,99,235,.12);
+
+    color:#2563eb;
+
+    font-size:18px;
+
+    font-weight:700;
+}
+
+#infos{
+
+    margin-bottom:25px;
+}
+
+#infos-compteur{
+
+    margin-top:20px;
+    margin-bottom:25px;
+}
+
+/* ========================================
+   CHAMPS
+======================================== */
+
+.ligne-validation{
+
+    display:flex;
+
+    gap:12px;
+
+    margin-bottom:15px;
+}
+
+input{
+
+    flex:1;
+
+    min-height:58px;
+
+    border:2px solid #e2e8f0;
+
+    border-radius:16px;
+
+    padding:0 18px;
+
+    font-size:18px;
+
+    background:white;
+}
+
+input:focus{
+
+    outline:none;
+
+    border-color:#2563eb;
+
+    box-shadow:
+        0 0 0 4px rgba(37,99,235,.15);
+}
+
+/* ========================================
+   BOUTONS
+======================================== */
+
+button{
+
+    border:none;
+
+    border-radius:16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1e40af,
+            #2563eb
+        );
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    min-height:58px;
+
+    padding:0 20px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+}
+
+button:hover:not(:disabled){
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 10px 20px rgba(37,99,235,.25);
+}
+
+button:disabled{
+
+    opacity:.5;
+
+    cursor:not-allowed;
+}
+
+/* ========================================
+   BOUTON ANNULER
+======================================== */
+
+#btnAnnuler{
+
+    background:
+        linear-gradient(
+            135deg,
+            #b91c1c,
+            #ef4444
+        );
+}
+
+#btnAnnuler:hover{
+
+    box-shadow:
+        0 10px 20px rgba(239,68,68,.25);
+}
+
+/* ========================================
+   VALIDATION
+======================================== */
+
+#affichageSupport,
+#affichageBT{
+
+    font-family:monospace;
+
+    font-size:20px;
+
+    text-align:center;
+
+    min-height:30px;
+
+    margin-top:10px;
+}
+
+.partie-ok{
+
+    color:#16a34a;
+}
+
+.partie-erreur{
+
+    color:#dc2626;
+
+    background:#fee2e2;
+
+    padding:2px 6px;
+
+    border-radius:6px;
+}
+
+#erreurSupport,
+#erreurBT{
+
+    text-align:center;
+
+    min-height:22px;
+
+    margin-top:8px;
+
+    font-weight:600;
+}
+
+/* ========================================
+   TABLEAU
+======================================== */
+
+#tableHistorique{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    overflow:hidden;
+
+    border-radius:18px;
+
+    background:
+        rgba(255,255,255,.95);
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.08);
+}
+
+#tableHistorique th{
+
+    background:#0f2d62;
+
+    color:white;
+
+    padding:14px;
+
+    text-align:center;
+}
+
+#tableHistorique td{
+
+    padding:14px;
+
+    text-align:center;
+
+    border-bottom:
+        1px solid #e2e8f0;
+}
+
+#tableHistorique tr:nth-child(even){
+
+    background:#f8fafc;
+}
+
+#tableHistorique tr:hover{
+
+    background:#eff6ff;
+}
+
+/* ========================================
+   FIN DE SCAN
+======================================== */
+
+#btnFinScan{
+
+    margin-top:25px;
+
+    width:100%;
+
+    justify-content:center;
+
+    min-height:64px;
+
+    font-size:18px;
+}
+
+/* ========================================
+   ANIMATION
+======================================== */
+
+#blocSupport,
+#blocBT{
+
+    animation:apparition .3s ease;
+}
+
+@keyframes apparition{
+
+    from{
+        opacity:0;
+        transform:translateY(15px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* ========================================
+   PDA ZEBRA
+======================================== */
+
+@media (max-width:730px){
+
+    body {
+
+        padding: 12px;
+    }
+
+    h1{
+
+        font-size:30px;
+
+        margin-top:85px;
+    }
+
+    h2{
+
+        font-size:18px;
+    }
+
+    .zone-scan{
+
+        width:94%;
+
+        padding:18px;
+    }
+
+    .ligne-validation{
+
+        flex-direction:column;
+    }
+
+    .ligne-validation input,
+    .ligne-validation button{
+
+        width:100%;
+    }
+
+    .btn-accueil {
+
+        left: 10px;
+    }
+
+    .btn-retour{
+
+        left:120px;
+    }
+
+    .btn-accueil button,
+    .btn-retour button{
+
+        min-height:46px;
+
+        font-size:14px;
+
+        padding: 0 12px;
+    }
+
+    .btn-infos {
+
+        width: 46px;
+
+        height: 46px;
+    }
+
+    .btn-infos img {
+
+        width: 24px;
+
+        height: 24px;
+    }
+
+    #tableHistorique th:nth-child(1),
+    #tableHistorique td:nth-child(1){
+
+        display:none;
+    }
+}

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fichiers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="style-fichier.css">
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/ASLOGOV1.PNG"
+    >
+</head>
+
+<body>
+
+<a href="accueil.html" class="btn-accueil">
+    <button>
+        <img
+            src="images/accueil2-blanc.png"
+            class="logo-action"
+        >
+        <span>Accueil</span>
+    </button>
+</a>
+
+<h1>FICHIERS</h1>
+
+<p class="sous-titre">
+    Bibliothèque des scans
+</p>
+
+<div class="filtres-types">
+
+    <button onclick="filtrerFichiers('tous')">Tous</button>
+
+    <button onclick="filtrerFichiers('reception')">Réception</button>
+
+    <button onclick="filtrerFichiers('expedition')">Expédition</button>
+
+    <button onclick="filtrerFichiers('adresse')">Mouvement</button>
+
+</div>
+
+<div id="bibliotheque"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script type="module">
+
+import { db } from "./firebase-config.js";
+import { ajouterHistorique } from "./historique.js";
+import {
+    collection,
+    getDocs,
+    deleteDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+if (!localStorage.getItem("utilisateur")) { window.location.href = "index.html"; }
+
+let bibliotheque = [];
+
+let container = document.getElementById("bibliotheque");
+
+chargerBibliotheque();
+
+
+// ===============================
+// CHARGEMENT FIREBASE
+// ===============================
+async function chargerBibliotheque() {
+
+    try {
+
+        const querySnapshot =
+            await getDocs(collection(db, "fichiersScans"));
+
+        bibliotheque = [];
+
+        querySnapshot.forEach((doc) => {
+
+            bibliotheque.push({
+                id: doc.id,
+                ...doc.data()
+            });
+
+        });
+
+        afficherFichiers("tous");
+
+    } catch (error) {
+
+        console.error("Erreur chargement Firebase :", error);
+
+        container.innerHTML =
+            "<p>❌ Erreur de chargement des fichiers</p>";
+    }
+}
+
+
+// ===============================
+// AFFICHAGE FILTRÉ
+// ===============================
+function afficherFichiers(type) {
+
+    container.innerHTML = "";
+
+    let fichiersFiltres = bibliotheque;
+
+    if (type !== "tous") {
+
+        fichiersFiltres = bibliotheque.filter(
+            fichier => fichier.type === type
+        );
+    }
+
+    if (fichiersFiltres.length === 0) {
+
+        container.innerHTML =
+            "<p>Aucun fichier dans cette catégorie</p>";
+
+        return;
+    }
+
+    fichiersFiltres.forEach((fichier, indexGlobal) => {
+
+        let vraiIndex =
+            bibliotheque.indexOf(fichier);
+
+        let typeLabel =
+            fichier.type || "reception";
+
+        let typeAffichage =
+            typeLabel === "adresse"
+                ? "MOUVEMENT"
+                : typeLabel.toUpperCase();
+
+        let bloc = document.createElement("div");
+
+        bloc.classList.add(
+            "fichier-card",
+            "type-" + typeLabel
+        );
+
+        bloc.innerHTML = `
+
+            <div class="fichier-top">
+
+                <span class="badge-type ${typeLabel}">
+                    ${typeAffichage}
+                </span>
+
+                <div class="fichier-infos-droite">
+
+                    <span class="fichier-date">
+                        ${fichier.dateCreation}
+                    </span>
+
+                    ${
+                        fichier.type !== "adresse"
+                        ? `
+                            <span class="fichier-total">
+                                ${fichier.totalScans} colis
+                            </span>
+                        `
+                        : ""
+                    }
+
+                </div>
+
+            </div>
+
+            <h3>${fichier.nom}</h3>
+
+            <div class="fichier-actions">
+
+                <button onclick="voirFichier(${vraiIndex})">
+                    <img
+                        src="images/ouvrir-blanc.png"
+                        class="logo-action-fichier"
+                    >
+                    <span>Ouvrir</span>
+                </button>
+
+                <button onclick="extraireFichier(${vraiIndex})">
+                    <img
+                        src="images/exporter-blanc.png"
+                        class="logo-action-fichier"
+                    >
+                    <span>Excel</span>
+                </button>
+
+                <button onclick="supprimerFichier(${vraiIndex})">
+                    <img
+                        src="images/supprimer-blanc.png"
+                        class="logo-action-fichier"
+                    >
+                    <span>Supprimer</span>
+                </button>
+
+            </div>
+        `;
+
+        container.appendChild(bloc);
+    });
+}
+
+
+// ===============================
+// FILTRE
+// ===============================
+function filtrerFichiers(type) {
+
+    afficherFichiers(type);
+}
+
+
+// ===============================
+// OUVRE LE FICHIER
+// ===============================
+async function voirFichier(index) {
+
+    localStorage.setItem(
+        "fichierActif",
+        JSON.stringify(bibliotheque[index])
+    );
+
+    let fichier =
+    bibliotheque[index];
+
+    await ajouterHistorique(
+        "Ouverture fichier",
+        fichier.nom,
+        {
+            type: fichier.type,
+            totalScans: fichier.totalScans
+        }
+    );
+
+    window.location.href = "fichier-detail.html";
+}
+
+
+// ===============================
+// EXTRACTION EXCEL
+// ===============================
+async function extraireFichier(index) {
+
+    let fichier = bibliotheque[index];
+
+    await ajouterHistorique(
+        "Extraction Excel",
+        fichier.nom,
+        {
+            type: fichier.type,
+            totalScans: fichier.totalScans
+        }
+    );
+
+    if (!fichier || !fichier.contenu) {
+
+        alert("Fichier introuvable");
+
+        return;
+    }
+
+    // ===============================
+    // DONNÉES EXCEL
+    // ===============================
+    let data = [];
+
+    // ===============================
+    // TYPE ADRESSE
+    // ===============================
+    if (fichier.type === "adresse") {
+
+        data.push([
+            "Numéro support",
+            "Adresse"
+        ]);
+
+        fichier.contenu.forEach(scan => {
+
+            data.push([
+                scan.support || "",
+                (scan.adresse || "").replace(/-/g, "")
+            ]);
+        });
+
+    } else {
+
+        // ===============================
+        // TYPE RÉCEPTION / EXPÉDITION
+        // ===============================
+        data.push([
+            "Numéro support",
+            "Numéro BT",
+            "Date"
+        ]);
+
+        fichier.contenu.forEach(scan => {
+
+            data.push([
+                scan.support || "",
+                scan.bt || "",
+                scan.date || ""
+            ]);
+        });
+    }
+
+    // ===============================
+    // CRÉATION FEUILLE
+    // ===============================
+    let worksheet =
+        XLSX.utils.aoa_to_sheet(data);
+
+    // FORCE FORMAT TEXTE
+    Object.keys(worksheet).forEach(cell => {
+
+        if (cell[0] === "!") {
+            return;
+        }
+
+        worksheet[cell].t = "s";
+    });
+
+    // LARGEUR COLONNES
+    worksheet["!cols"] = [
+
+        { wch: 22 },
+        { wch: 24 },
+        { wch: 15 }
+    ];
+
+    // ===============================
+    // CLASSEUR EXCEL
+    // ===============================
+    let workbook =
+        XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Scans"
+    );
+
+    // ===============================
+    // NOM FICHIER PROPRE
+    // ===============================
+    let nomFichier =
+        fichier.nom.replace(/[\\\\/:*?"<>|]/g, "_");
+
+    // ===============================
+    // EXPORT XLSX
+    // ===============================
+    XLSX.writeFile(
+        workbook,
+        nomFichier + ".xlsx"
+    );
+}
+
+
+// ===============================
+// SUPPRIME LE FICHIER
+// ===============================
+async function supprimerFichier(index) {
+
+    if (!confirm("Supprimer ce fichier ?")) {
+        return;
+    }
+
+    try {
+
+        let fichier =
+            bibliotheque[index];
+
+        await deleteDoc(
+            doc(db, "fichiersScans", fichier.id)
+        );
+
+        await ajouterHistorique(
+            "Suppression fichier",
+            fichier.nom,
+            {
+                type: fichier.type,
+                totalScans: fichier.totalScans
+            }
+        );
+
+        alert("✅ Fichier supprimé");
+
+        chargerBibliotheque();
+
+    } catch (error) {
+
+        console.error("Erreur suppression Firebase :", error);
+
+        alert("❌ Erreur lors de la suppression");
+    }
+}
+
+window.afficherFichiers = afficherFichiers;
+window.filtrerFichiers = filtrerFichiers;
+window.voirFichier = voirFichier;
+window.extraireFichier = extraireFichier;
+window.supprimerFichier = supprimerFichier;
+
+</script>
+
+<script type="module" src="maintenance.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+</body>
+</html>

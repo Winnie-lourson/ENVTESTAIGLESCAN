@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Détail du fichier</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="style-fichier-detail.css">
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/ASLOGOV1.PNG"
+    >
+</head>
+
+<body>
+
+<a href="accueil.html" class="btn-accueil">
+    <button>
+        <img
+            src="images/accueil2-blanc.png"
+            class="logo-action"
+        >
+        <span>Accueil</span>
+    </button>
+</a>
+
+<a href="fichier.html" class="btn-retour">
+    <button>
+        <img
+            src="images/retour-blanc.png"
+            class="logo-action"
+        >
+        <span>Retour</span>
+    </button>
+</a>
+
+<h1>FICHIERS</h1>
+
+<h2>Consultation et modification</h2>
+
+<div class="zone-scan">
+
+    <h3 id="nomFichier"></h3>
+
+    <p id="infos">
+        Total scans : <span id="totalScans">0</span>
+    </p>
+
+    <table id="tableHistorique">
+        <thead>
+            <tr>
+                <th>Numéro support</th>
+                <th>Numéro BT</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="historiqueBody">
+        </tbody>
+
+    </table>
+
+    <div class="zone-ajout">
+
+    <button
+        id="btnAjouterLigne"
+        onclick="afficherFormulaireAjout()"
+    >
+        <img
+            src="images/ajouter-blanc.png"
+            class="logo-action"
+        >
+        <span>Ajouter une ligne</span>
+        <img
+            src="images/entre-blanc.png"
+            class="logo-bouton"
+        >
+    </button>
+
+    <div id="formAjout" style="display:none;">
+
+        <input 
+            type="text"
+            id="newBT"
+            placeholder="Numéro BT"
+            oninput="verifierNouveauBT()"
+        >
+
+        <button
+            id="btnValiderLigne"
+            onclick="ajouterNouvelleLigne()"
+        >
+            <span>Valider</span>
+            <img
+                src="images/entre-blanc.png"
+                class="logo-bouton"
+            >
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { db } from "./firebase-config.js";
+import { ajouterHistorique } from "./historique.js";
+import {
+    doc,
+    updateDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+if (!localStorage.getItem("utilisateur")) { window.location.href = "index.html"; }
+
+// ===============================
+// RÉCUPÉRATION FICHIER ACTIF
+// ===============================
+let fichier =
+    JSON.parse(localStorage.getItem("fichierActif"));
+
+if (!fichier) {
+
+    alert("Aucun fichier trouvé");
+
+    window.location.href = "fichier.html";
+}
+
+
+// ===============================
+// TITRE
+// ===============================
+document.getElementById("nomFichier").innerText = fichier.nom;
+
+
+// ===============================
+// MASQUER AJOUT POUR ADRESSE
+// ===============================
+if (fichier.type === "adresse") {
+
+    document.querySelector(".zone-ajout").style.display =
+        "none";
+}
+
+
+// ===============================
+// TABLEAU
+// ===============================
+let tableBody = document.getElementById("historiqueBody");
+
+
+// ===============================
+// ADAPTATION EN-TÊTES SELON TYPE
+// ===============================
+if (fichier.type === "adresse") {
+
+    document.querySelector("#tableHistorique thead tr").innerHTML = `
+        <th>Numéro support</th>
+        <th>Adresse</th>
+        <th>Action</th>
+    `;
+
+} else {
+
+    document.querySelector("#tableHistorique thead tr").innerHTML = `
+        <th>Numéro support</th>
+        <th>Numéro BT</th>
+        <th>Date</th>
+        <th>Action</th>
+    `;
+}
+
+
+// ===============================
+// GÉNÉRATION LIGNES
+// ===============================
+fichier.contenu.forEach(scan => {
+
+    let ligne =
+        document.createElement("tr");
+
+    if (fichier.type === "adresse") {
+
+        ligne.innerHTML = `
+            <td>${scan.support || "-"}</td>
+            <td>${scan.adresse || "-"}</td>
+            <td>
+                <button
+                    class="btn-supprimer"
+                    onclick="supprimerLigne('${scan.adresse}')"
+                >
+                    <img
+                        src="images/supprimer-rouge.png"
+                        class="logo-supprimer"
+                    >
+                </button>
+            </td>
+        `;
+
+    } else {
+
+        ligne.innerHTML = `
+            <td>${scan.support || "-"}</td>
+            <td>${scan.bt || "-"}</td>
+            <td>${scan.date || "-"}</td>
+            <td>
+                <button
+                    class="btn-supprimer"
+                    onclick="supprimerLigne('${scan.bt}')"
+                >
+                    <img
+                        src="images/supprimer-rouge.png"
+                        class="logo-supprimer"
+                    >
+                </button>
+            </td>
+        `;
+    }
+
+    tableBody.appendChild(ligne);
+});
+
+
+// ===============================
+// COMPTEUR
+// ===============================
+document.getElementById("totalScans").textContent = fichier.contenu.length;
+
+
+// ===============================
+// SUPPRIMER UNE LIGNE + SAUVEGARDE
+// ===============================
+async function supprimerLigne(valeurASupprimer) {
+
+    if (!confirm("Supprimer ce scan ?")) {
+        return;
+    }
+
+    let ligneSupprimee;
+
+    if (fichier.type === "adresse") {
+
+        ligneSupprimee =
+            fichier.contenu.find(
+                scan => scan.adresse === valeurASupprimer
+            );
+
+    } else {
+
+        ligneSupprimee =
+            fichier.contenu.find(
+                scan => scan.bt === valeurASupprimer
+            );
+    }
+
+    // Cas Adresse
+    if (fichier.type === "adresse") {
+
+        fichier.contenu =
+            fichier.contenu.filter(
+                scan => scan.adresse !== valeurASupprimer
+            );
+
+    } else {
+
+        // Cas Réception / Expédition
+        fichier.contenu =
+            fichier.contenu.filter(
+                scan => scan.bt !== valeurASupprimer
+            );
+    }
+
+    // Mise à jour compteur
+    fichier.totalScans =
+        fichier.contenu.length;
+
+    try {
+
+        // Mise à jour Firebase
+        await updateDoc(
+            doc(db, "fichiersScans", fichier.id),
+            {
+                contenu: fichier.contenu,
+                totalScans: fichier.totalScans
+            }
+        );
+
+        await ajouterHistorique(
+            fichier.type === "adresse"
+                ? "Suppression mouvement"
+                : "Suppression ligne",
+            fichier.nom,
+            {
+                support: ligneSupprimee?.support || "",
+                valeur: valeurASupprimer,
+                type: fichier.type
+            }
+        );
+
+        // Mise à jour cache local
+        localStorage.setItem(
+            "fichierActif",
+            JSON.stringify(fichier)
+        );
+
+        location.reload();
+
+    } catch (error) {
+
+        console.error("Erreur Firebase :", error);
+
+        alert("❌ Erreur lors de la suppression");
+    }
+}
+
+
+// ===============================
+// AFFICHER FORMULAIRE AJOUT
+// ===============================
+function afficherFormulaireAjout() {
+
+    let form =
+        document.getElementById("formAjout");
+
+    if (form.style.display === "none") {
+
+        form.style.display = "block";
+        setTimeout(() => {
+
+            document.getElementById("newBT").focus();
+
+        }, 100);
+
+    } else {
+
+        form.style.display = "none";
+    }
+}
+
+
+// ===============================
+// VÉRIFICATION NOUVEAU BT
+// ===============================
+function verifierNouveauBT() {
+
+    let champ = document.getElementById("bt");
+    let bouton = document.getElementById("btnBT");
+    let message = document.getElementById("erreurBT");
+    let affichage = document.getElementById("affichageBT");
+
+    let bt = champ.value.trim();
+
+    clearTimeout(timerBTValidation);
+
+    validationBTLancee = false;
+
+    message.innerText = "";
+    affichage.innerHTML = "";
+
+    // Vérifie uniquement que le champ n'est pas vide
+    if (bt.length === 0) {
+
+        bouton.disabled = true;
+
+        return;
+    }
+
+    // Vérification doublon
+    let lignesExistantes =
+        document.querySelectorAll("#historiqueBody tr");
+
+    for (let ligne of lignesExistantes) {
+
+        let existingBT = ligne.cells[1].textContent;
+
+        if (existingBT === bt) {
+
+            bouton.disabled = true;
+
+            affichage.innerHTML =
+                "<span class='partie-erreur'>" +
+                bt +
+                "</span>";
+
+            message.innerText =
+                "❌ BT déjà scanné";
+
+            jouerSonErreur();
+
+            return;
+        }
+    }
+
+    // BT valide
+    affichage.innerHTML =
+        "<span class='partie-ok'>" +
+        bt +
+        "</span>";
+
+    message.innerText =
+        "✅ BT valide";
+
+    message.style.color = "green";
+
+    bouton.disabled = false;
+
+    if (!validationBTLancee) {
+
+        validationBTLancee = true;
+
+        jouerSonValidation();
+
+        timerBTValidation = setTimeout(() => {
+
+            if (!document.getElementById("btnBT").disabled) {
+
+                ajouterBT();
+            }
+
+        }, 1000);
+    }
+}
+
+
+// ===============================
+// AJOUTER UNE LIGNE
+// ===============================
+async function ajouterNouvelleLigne() {
+
+    let support = fichier.contenu[0]?.support || "";
+    let valeur = document.getElementById("newBT").value.trim();
+
+    // Vérification sécurité
+    if (
+        (valeur.length !== 15 && valeur.length !== 18)
+    ) {
+
+        alert("❌ BT invalide");
+
+        return;
+    }
+
+    if (
+        valeur.length === 15 &&
+        !valeur.startsWith("1")
+    ) {
+
+        alert("❌ BT invalide");
+
+        return;
+    }
+
+    if (
+        valeur.length === 18 &&
+        !valeur.startsWith("25003100")
+    ) {
+
+        alert("❌ BT invalide");
+
+        return;
+    }
+
+    if (valeur === "") {
+
+        alert("Veuillez remplir tous les champs");
+
+        return;
+    }
+
+    // Cas adresse
+    if (fichier.type === "adresse") {
+
+        let doublon = fichier.contenu.some(
+            scan => scan.adresse === valeur
+        );
+
+        if (doublon) {
+
+            alert("❌ Adresse déjà présente");
+
+            return;
+        }
+
+        fichier.contenu.push({
+            support: support,
+            adresse: valeur
+        });
+
+    } else {
+
+        let today = new Date();
+
+        let jour = String(today.getDate()).padStart(2, '0');
+        let mois = String(today.getMonth() + 1).padStart(2, '0');
+        let annee = today.getFullYear();
+
+        let doublon = fichier.contenu.some(
+            scan => scan.bt === valeur
+        );
+
+        if (doublon) {
+
+            alert("❌ BT déjà présent");
+
+            return;
+        }
+
+        fichier.contenu.push({
+            support: support,
+            bt: valeur,
+            date: jour + "/" + mois + "/" + annee
+        });
+    }
+
+    // Mise à jour compteur
+    fichier.totalScans =
+        fichier.contenu.length;
+
+    try {
+
+        // Sauvegarde Firebase
+        await updateDoc(
+            doc(db, "fichiersScans", fichier.id),
+            {
+                contenu: fichier.contenu,
+                totalScans: fichier.totalScans
+            }
+        );
+
+        await ajouterHistorique(
+            fichier.type === "adresse"
+                ? "Ajout manuel mouvement"
+                : "Ajout BT manuel",
+            fichier.nom,
+            {
+                support: support,
+                bt: valeur,
+                type: fichier.type
+            }
+        );
+
+        // Mise à jour fichier actif
+        localStorage.setItem(
+            "fichierActif",
+            JSON.stringify(fichier)
+        );
+
+        document.getElementById("newBT").value = "";
+        document.getElementById("formAjout").style.display = "none";
+
+        alert("✅ Ligne ajoutée");
+
+        location.reload();
+
+    } catch (error) {
+
+        console.error("Erreur Firebase :", error);
+
+        alert("❌ Erreur lors de l’ajout");
+    }
+}
+
+window.afficherFormulaireAjout = afficherFormulaireAjout;
+window.ajouterNouvelleLigne = ajouterNouvelleLigne;
+window.supprimerLigne = supprimerLigne;
+window.verifierNouveauBT = verifierNouveauBT;
+
+</script>
+
+<script type="module" src="maintenance.js"></script>
+
+</body>
+</html>

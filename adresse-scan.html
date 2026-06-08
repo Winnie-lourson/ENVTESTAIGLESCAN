@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emplacement scan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="style-adresse-scan.css">
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/ASLOGOV1.PNG"
+    >
+</head>
+
+<body>
+
+<a href="accueil.html" class="btn-accueil">
+    <button>
+        <img
+            src="images/accueil2-blanc.png"
+            class="logo-action"
+        >
+        <span>Accueil</span>
+    </button>
+</a>
+
+<a class="btn-retour" id="btnRetour">
+    <button onclick="retourEtape1()">
+        <img
+            src="images/retour-blanc.png"
+            class="logo-action"
+        >
+        <span>Retour</span>
+    </button>
+</a>
+
+<a href="infos.html" class="btn-infos">
+    <img src="images/INFOS-BLANC.png" alt="Infos">
+</a>
+
+<h1>MOUVEMENT</h1>
+
+<h2>Scan palette</h2>
+
+<div class="zone-scan">
+
+    <h3 id="infos"></h3>
+
+    <!-- ===============================
+         ÉTAPE 1 : SUPPORT
+    =============================== -->
+    <div id="blocSupport">
+
+        <div class="ligne-validation">
+
+            <input 
+                type="text" 
+                id="support" 
+                placeholder="Numéro de support"
+                maxlength="18"
+                inputmode="numeric"
+                oninput="verifierSupport()"
+            >
+
+            <button id="btnSupport" onclick="validerSupport()" disabled>
+                <span>Valider</span>
+                <img
+                    src="images/entre-blanc.png"
+                    class="logo-bouton"
+                >
+            </button>
+
+        </div>
+
+        <div id="affichageSupport"></div>
+
+        <p id="erreurSupport"></p>
+
+    </div>
+
+    <!-- ===============================
+         ÉTAPE 2 : ADRESSE
+    =============================== -->
+    <div id="blocBT" style="display:none;">
+
+        <div class="ligne-validation">
+
+            <input 
+                type="text" 
+                id="bt" 
+                placeholder="Emplacement"
+                maxlength="9"
+                oninput="verifierBT()"
+            >
+
+            <button id="btnBT" onclick="ajouterBT()" disabled>
+                <span>Valider</span>
+                <img
+                    src="images/entre-blanc.png"
+                    class="logo-bouton"
+                >
+            </button>
+
+            <button id="btnAnnuler" onclick="annulerScan()" style="display:none;">
+                <img
+                    src="images/croix.png"
+                    class="logo-action"
+                >
+                <span>Annuler scan</span>
+            </button>
+
+        </div>
+
+        <div id="affichageBT"></div>
+
+        <p id="erreurBT"></p>
+
+        <table id="tableHistorique">
+
+            <thead>
+                <tr>
+                    <th>Numéro support</th>
+                    <th>Adresse</th>
+                </tr>
+            </thead>
+
+            <tbody id="historiqueBody">
+            </tbody>
+
+        </table>
+
+        <button id="btnFinScan" onclick="finDeScan()">
+            <span>Fin de scan</span>
+            <img
+                src="images/entre-blanc.png"
+                class="logo-bouton"
+            >
+        </button>
+
+    </div>
+
+<script type="module">
+
+import { db } from "./firebase-config.js";
+import { ajouterHistorique } from "./historique.js";
+import {
+    collection,
+    addDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+if (!localStorage.getItem("utilisateur")) { window.location.href = "index.html"; }
+
+// ===============================
+// INFOS PAGE
+// ===============================
+let params = new URLSearchParams(window.location.search);
+let palette = params.get("palette");
+let commentaire = params.get("commentaire");
+
+document.getElementById("infos").innerText =
+    palette + " / " + commentaire;
+
+
+// ===============================
+// AUDIO
+// ===============================
+let validationLancee = false;
+let timerValidation = null;
+let dernierSonErreur = 0;
+let validationBTLancee = false;
+let timerBTValidation = null;
+
+
+// ===============================
+// VALIDATION SUPPORT
+// ===============================
+document.getElementById("support").focus();
+
+async function validerSupport() {
+
+    let support = document.getElementById("support").value.trim();
+
+    await ajouterHistorique(
+        "Validation support",
+        palette,
+        {
+            support: support,
+            palette: palette,
+            type: "adresse"
+        }
+    );
+
+    if (support === "") {
+        return;
+    }
+
+    document.getElementById("infos").innerText =
+        palette + " / Support : " + support;
+
+    document.getElementById("blocSupport").style.display = "none";
+
+    document.getElementById("blocBT").style.display = "block";
+
+    document.getElementById("bt").focus();
+}
+
+
+// ===============================
+// SON VALIDATION
+// ===============================
+function jouerSonValidation() {
+
+    let audio = new Audio("sons/validation.mp3");
+
+    audio.volume = 1.0;
+
+    audio.play();
+}
+
+
+// ===============================
+// SON ERREUR
+// ===============================
+function jouerSonErreur() {
+
+    let maintenant = Date.now();
+
+    if (maintenant - dernierSonErreur < 1000) {
+        return;
+    }
+
+    dernierSonErreur = maintenant;
+
+    let audio = new Audio("sons/erreur.mp3");
+
+    audio.volume = 1.0;
+
+    audio.play();
+}
+
+
+// ===============================
+// REFOCUS BT APRÈS ERREUR
+// ===============================
+function refocusBT() {
+
+    let champ =
+        document.getElementById("bt");
+
+    if (!champ || champ.disabled) {
+        return;
+    }
+
+    setTimeout(() => {
+
+        champ.focus();
+
+    }, 120);
+}
+
+
+// ===============================
+// VÉRIFICATION NUMÉRO SUPPORT
+// ===============================
+function verifierSupport() {
+
+    let champ = document.getElementById("support");
+    let bouton = document.getElementById("btnSupport");
+    let message = document.getElementById("erreurSupport");
+    let affichage = document.getElementById("affichageSupport");
+
+    champ.value =
+        champ.value.replace(/[^0-9]/g, '');
+
+    let support = champ.value;
+
+    // Annule validation si modification
+    clearTimeout(timerValidation);
+
+    validationLancee = false;
+
+    let prefixe = "0399999010910";
+
+    let numeroInterne = parseInt(palette);
+
+    let clefAttendue = 19070 + numeroInterne;
+
+    message.innerText = "";
+    message.style.color = "red";
+
+    affichage.innerHTML = "";
+
+    // ===============================
+    // LONGUEUR
+    // ===============================
+    if (support.length < 18) {
+
+        bouton.disabled = true;
+
+        message.innerText =
+            "❌ 18 chiffres requis";
+
+        jouerSonErreur();
+
+        return;
+    }
+
+    // ===============================
+    // PREFIXE
+    // ===============================
+    let prefixInput = support.slice(0, 13);
+
+    if (prefixInput !== prefixe) {
+
+        bouton.disabled = true;
+
+        let prefixeAffiche = "";
+
+        for (let i = 0; i < prefixe.length; i++) {
+
+            let chiffreTape =
+                prefixInput[i] || "_";
+
+            if (chiffreTape === prefixe[i]) {
+
+                prefixeAffiche +=
+                    "<span class='partie-ok'>" +
+                    chiffreTape +
+                    "</span>";
+
+            } else {
+
+                prefixeAffiche +=
+                    "<span class='partie-erreur'>" +
+                    chiffreTape +
+                    "</span>";
+            }
+        }
+
+        let finSupport = support.slice(13);
+
+        affichage.innerHTML =
+            prefixeAffiche +
+            "<span>" + finSupport + "</span>";
+
+        message.innerText =
+            "❌ Préfixe incorrect | Attendu : " +
+            prefixe;
+
+        jouerSonErreur();
+
+        return;
+    }
+
+    // ===============================
+    // CLÉ
+    // ===============================
+    let finInput = support.slice(13);
+
+    let cinqDerniers = parseInt(finInput);
+
+    if ((cinqDerniers - numeroInterne) !== 19070) {
+
+        bouton.disabled = true;
+
+        affichage.innerHTML =
+            "<span class='partie-ok'>" +
+            prefixInput +
+            "</span>" +
+            "<span class='partie-erreur'>" +
+            finInput +
+            "</span>";
+
+        message.innerText =
+            "❌ Clé incorrecte | Attendu : " +
+            clefAttendue;
+
+        jouerSonErreur();
+
+        return;
+    }
+
+    // ===============================
+    // OK
+    // ===============================
+    affichage.innerHTML =
+        "<span class='partie-ok'>" +
+        support +
+        "</span>";
+
+    message.innerText =
+        "✅ Numéro valide";
+
+    message.style.color = "green";
+
+    bouton.disabled = false;
+
+    if (!validationLancee) {
+
+        validationLancee = true;
+
+        jouerSonValidation();
+
+        timerValidation = setTimeout(() => {
+
+            if (document.getElementById("btnSupport").disabled === false) {
+
+                validerSupport();
+            }
+
+        }, 1500);
+    }
+}
+
+
+// ===============================
+// VÉRIFICATION ADRESSE
+// ===============================
+function verifierBT() {
+
+    let champ = document.getElementById("bt");
+    let bouton = document.getElementById("btnBT");
+    let message = document.getElementById("erreurBT");
+    let affichage = document.getElementById("affichageBT");
+
+    champ.value = champ.value
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '');
+
+    let bt = champ.value;
+
+    clearTimeout(timerBTValidation);
+
+    validationBTLancee = false;
+
+    message.innerText = "";
+    message.style.color = "red";
+
+    affichage.innerHTML = "";
+
+    if (bt.length !== 9) {
+
+        bouton.disabled = true;
+
+        message.innerText =
+            "❌ Adresse inexistante";
+
+        if (bt.length > 0) {
+            jouerSonErreur();
+            refocusBT();
+
+        }
+
+        return;
+    }
+
+    if (!/^TU\d{4}[ABCD]\d{2}$/.test(bt)) {
+
+        bouton.disabled = true;
+
+        message.innerText =
+            "❌ Adresse inexistante";
+
+        jouerSonErreur();
+        refocusBT();
+
+        return;
+    }
+
+    if (document.querySelectorAll("#historiqueBody tr").length > 0) {
+
+        bouton.disabled = true;
+
+        message.innerText =
+            "❌ Une seule adresse peut être validée";
+
+        jouerSonErreur();
+        refocusBT();
+
+        return;
+    }
+
+    affichage.innerHTML =
+        "<span class='partie-ok'>" + bt + "</span>";
+
+    message.innerText =
+        "✅ Adresse valide";
+
+    message.style.color = "green";
+
+    bouton.disabled = false;
+
+    if (!validationBTLancee) {
+
+        validationBTLancee = true;
+
+        jouerSonValidation();
+
+        timerBTValidation = setTimeout(() => {
+
+            if (!document.getElementById("btnBT").disabled) {
+
+                ajouterBT();
+            }
+
+        }, 1000);
+    }
+}
+
+
+// ===============================
+// AJOUT TABLEAU
+// ===============================
+async function ajouterBT() {
+
+    let support =
+        document.getElementById("support").value.trim();
+
+    let bt =
+        document.getElementById("bt").value.trim().toUpperCase();
+
+    if (bt === "") {
+        return;
+    }
+
+    let tableBody =
+        document.getElementById("historiqueBody");
+
+    if (tableBody.rows.length > 0) {
+        return;
+    }
+
+    let btAffiche =
+        bt.slice(0,2) + "-" +
+        bt.slice(2,4) + "-" +
+        bt.slice(4,6) + "-" +
+        bt.slice(6,7) + "-" +
+        bt.slice(7,9);
+
+    let ligne =
+        document.createElement("tr");
+
+    let celluleSupport =
+        document.createElement("td");
+
+    celluleSupport.textContent =
+        support;
+
+    let celluleAdresse =
+        document.createElement("td");
+
+    celluleAdresse.textContent =
+        btAffiche;
+
+    ligne.appendChild(celluleSupport);
+    ligne.appendChild(celluleAdresse);
+
+    tableBody.appendChild(ligne);
+
+    await ajouterHistorique(
+        "Scan adresse",
+        palette,
+        {
+            support: support,
+            adresse: bt,
+            palette: palette,
+            type: "adresse"
+        }
+    );
+
+    document.getElementById("bt").style.display = "none";
+
+    document.getElementById("btnBT").style.display = "none";
+
+    document.getElementById("btnAnnuler").style.display = "inline-block";
+
+    document.getElementById("btnAnnuler").disabled = false;
+
+    document.getElementById("erreurBT").innerText = "";
+
+    document.getElementById("affichageBT").innerHTML = "";
+
+    document.getElementById("bt").value = "";
+}
+
+
+// ===============================
+// ANNULER SCAN ADRESSE
+// ===============================
+async function annulerScan() {
+
+    let confirmation =
+        confirm("Voulez-vous vraiment annuler cette adresse scannée ?");
+
+    if (!confirmation) {
+        return;
+    }
+
+    let support = document.getElementById("support").value.trim();
+
+    let adresse = document.querySelector("#historiqueBody tr td:nth-child(2)")?.textContent || "";
+
+    await ajouterHistorique(
+        "Annulation adresse",
+        palette,
+        {
+            support: support,
+            adresse: adresse,
+            palette: palette,
+            type: "adresse"
+        }
+    );
+
+    // Stop auto-validation
+    clearTimeout(timerBTValidation);
+
+    validationBTLancee = false;
+
+    // Vide tableau
+    document.getElementById("historiqueBody").innerHTML =
+        "";
+
+    // Réinitialise champ
+    document.getElementById("bt").value =
+        "";
+
+    // Désactive validation
+    document.getElementById("btnBT").disabled =
+        true;
+
+    document.getElementById("bt").style.display =
+    "inline-block";
+
+    document.getElementById("btnBT").style.display =
+        "inline-block";
+
+    document.getElementById("btnAnnuler").style.display =
+        "none";
+
+    document.getElementById("bt").disabled =
+        false;
+
+    document.getElementById("btnBT").disabled =
+        true;
+
+    // Reset affichages
+    document.getElementById("erreurBT").innerText =
+        "";
+
+    document.getElementById("erreurBT").style.color =
+        "red";
+
+    document.getElementById("affichageBT").innerHTML =
+        "";
+
+    // Reset variable son erreur
+    dernierSonErreur = 0;
+
+    // Focus retour
+    document.getElementById("bt").focus();
+}
+
+
+// ===============================
+// FIN DE SCAN + SAUVEGARDE
+// ===============================
+async function finDeScan() {
+
+    let confirmation =
+        confirm("Voulez-vous vraiment terminer ce scan ?");
+
+    if (!confirmation) {
+        return;
+    }
+
+    let lignes =
+        document.querySelectorAll("#historiqueBody tr");
+
+    if (lignes.length === 0) {
+
+        alert("Aucune adresse enregistrée");
+
+        return;
+    }
+
+    let nomFichier = palette;
+
+    let donneesScan = [];
+
+    lignes.forEach(ligne => {
+
+        let support =
+            ligne.cells[0].textContent;
+
+        let adresse =
+            ligne.cells[1].textContent;
+
+        donneesScan.push({
+            support: support,
+            adresse: adresse
+        });
+    });
+
+    // Enregistrement Firebase
+    try {
+
+        await addDoc(collection(db, "fichiersScans"), {
+            nom: nomFichier,
+            type: "adresse",
+            dateCreation: new Date().toLocaleDateString(),
+            totalScans: donneesScan.length,
+            contenu: donneesScan
+        });
+
+        await ajouterHistorique(
+            "Création fichier adresse",
+            nomFichier,
+            {
+                palette: palette,
+                totalScans: donneesScan.length,
+                type: "adresse"
+            }
+        );
+
+        alert("✅ Fichier enregistré avec succès");
+
+        window.location.href = "fichier.html";
+
+    } catch (error) {
+
+        console.error("Erreur Firebase :", error);
+
+        alert("❌ Erreur lors de l’enregistrement");
+    }
+
+}
+
+window.validerSupport = validerSupport;
+window.verifierSupport = verifierSupport;
+window.verifierBT = verifierBT;
+window.ajouterBT = ajouterBT;
+window.annulerScan = annulerScan;
+window.finDeScan = finDeScan;
+
+</script>
+
+<script type="module" src="maintenance.js"></script>
+
+</body>
+</html>

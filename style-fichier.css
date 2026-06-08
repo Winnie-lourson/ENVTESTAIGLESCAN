@@ -1,0 +1,642 @@
+/* ========================================
+   RESET
+======================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+
+    width: 100%;
+    min-height: 100vh;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc 0%,
+            #eef2f7 100%
+        );
+
+    color: #0f172a;
+}
+
+/* ========================================
+   TITRES
+======================================== */
+
+h1 {
+
+    text-align: center;
+
+    font-size: 56px;
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    color: #0f2d62;
+
+    margin-top: 40px;
+
+    margin-bottom: 10px;
+}
+
+.sous-titre {
+
+    text-align: center;
+
+    font-size: 20px;
+
+    color: #64748b;
+
+    font-weight: 600;
+
+    margin-bottom: 30px;
+}
+
+/* ========================================
+   BOUTON ACCUEIL
+======================================== */
+
+.btn-accueil {
+
+    position: fixed;
+
+    top: 15px;
+
+    left: 15px;
+
+    z-index: 999;
+}
+
+.btn-accueil button {
+
+    min-height: 52px;
+
+    padding: 0 18px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f2d62,
+            #1e40af
+        );
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.btn-accueil button:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.15);
+}
+
+/* ========================================
+   ICÔNES
+======================================== */
+
+.logo-action {
+
+    width: 18px;
+
+    height: 18px;
+
+    object-fit: contain;
+}
+
+.logo-action-fichier {
+
+    width: 18px;
+
+    height: 18px;
+
+    object-fit: contain;
+}
+
+/* ========================================
+   FILTRES
+======================================== */
+
+.filtres-types {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    margin-bottom: 30px;
+}
+
+.filtres-types button {
+
+    min-width: 140px;
+
+    min-height: 52px;
+
+    border: none;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1e40af,
+            #2563eb
+        );
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.filtres-types button:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 20px rgba(37,99,235,0.25);
+}
+
+.fichier-actions button:nth-child(1) {
+
+    background:
+    linear-gradient(
+        135deg,
+        #1e40af,
+        #2563eb
+    );
+}
+
+.fichier-actions button:nth-child(2) {
+
+    background:
+    linear-gradient(
+        135deg,
+        #15803d,
+        #22c55e
+    );
+}
+
+.fichier-actions button:nth-child(3) {
+
+    background:
+    linear-gradient(
+        135deg,
+        #b91c1c,
+        #ef4444
+    );
+}
+
+/* ========================================
+   BIBLIOTHÈQUE
+======================================== */
+
+#bibliotheque {
+
+    width: 95%;
+
+    max-width: 1500px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(350px, 1fr));
+
+    gap: 24px;
+
+    padding-bottom: 50px;
+}
+
+/* ========================================
+   CARTE FICHIER
+======================================== */
+
+.fichier-card {
+
+    background:
+        rgba(255,255,255,0.85);
+
+    backdrop-filter: blur(12px);
+
+    border-radius: 24px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.08);
+
+    transition: 0.3s;
+
+    min-height: 180px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+}
+
+.fichier-card:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 16px 35px rgba(0,0,0,0.12);
+}
+
+/* ========================================
+   BORDURES TYPES
+======================================== */
+
+.type-reception {
+
+    border-left: 8px solid #2563eb;
+}
+
+.type-expedition {
+
+    border-left: 8px solid #16a34a;
+}
+
+.type-adresse {
+
+    border-left: 8px solid #ea580c;
+}
+
+/* ========================================
+   ENTÊTE
+======================================== */
+
+.fichier-top {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    margin-bottom: 12px;
+}
+
+.badge-type {
+
+    padding: 8px 16px;
+
+    border-radius: 999px;
+
+    color: white;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+}
+
+.badge-type.reception {
+
+    background: #2563eb;
+}
+
+.badge-type.expedition {
+
+    background: #16a34a;
+}
+
+.badge-type.adresse {
+
+    background: #ea580c;
+}
+
+/* ========================================
+   INFOS
+======================================== */
+
+.fichier-infos-droite {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    gap: 4px;
+}
+
+.fichier-date {
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.fichier-total {
+
+    color: #0f172a;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+/* ========================================
+   NOM FICHIER
+======================================== */
+
+h3 {
+
+    color: #0f2d62;
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    line-height: 1.4;
+
+    margin: 15px 0;
+
+    word-break: break-word;
+}
+
+/* ========================================
+   ACTIONS
+======================================== */
+
+.fichier-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    margin-top: 10px;
+}
+
+.fichier-actions button {
+
+    flex: 1;
+
+    min-width: 120px;
+
+    min-height: 48px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1e40af,
+            #2563eb
+        );
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.fichier-actions button:hover {
+
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   TABLE HISTORIQUE
+======================================== */
+
+#tableHistorique {
+
+    width: 95%;
+
+    max-width: 1400px;
+
+    margin: 25px auto;
+
+    border-collapse: collapse;
+
+    background:
+        rgba(255,255,255,0.95);
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,0.08);
+}
+
+#tableHistorique th {
+
+    background: #f1f5f9;
+
+    color: #0f172a;
+
+    font-weight: 700;
+}
+
+#tableHistorique th,
+#tableHistorique td {
+
+    padding: 14px;
+
+    border: 1px solid #e2e8f0;
+
+    text-align: left;
+}
+
+#tableHistorique tr:nth-child(even) {
+
+    background: #f8fafc;
+}
+
+#tableHistorique tr:hover {
+
+    background: #eff6ff;
+}
+
+/* ========================================
+   SUPPRESSION TABLEAU
+======================================== */
+
+.btn-supprimer {
+
+    background: transparent;
+
+    color: #dc2626;
+
+    border: none;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+.btn-supprimer:hover {
+
+    background: #fee2e2;
+}
+
+/* ========================================
+   TABLETTE
+======================================== */
+
+@media (max-width: 900px) {
+
+    h1 {
+
+        font-size: 42px;
+
+        margin-top: 90px;
+    }
+
+    #bibliotheque {
+
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   PDA ZEBRA
+======================================== */
+
+@media (max-width: 400px) {
+
+    body {
+
+        padding: 12px;
+    }
+
+    h1 {
+
+        font-size: 30px;
+
+        margin-top: 85px;
+    }
+
+    .sous-titre {
+
+        font-size: 16px;
+    }
+
+    .filtres-types {
+
+        gap: 8px;
+
+        flex-wrap: wrap;
+    }
+
+    .filtres-types button {
+
+        min-width: 120px;
+
+        min-height: 48px;
+
+        font-size: 13px;
+    }
+
+    #bibliotheque {
+
+        width: 92%;
+    }
+
+    .fichier-card {
+
+        min-height: auto;
+
+        padding: 18px;
+    }
+
+    .fichier-top {
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+    .fichier-infos-droite {
+
+        align-items: flex-start;
+    }
+
+    .fichier-actions {
+
+        flex-direction: column;
+    }
+
+    .fichier-actions button {
+
+        width: 100%;
+    }
+
+    .btn-accueil {
+
+        left: 10px;
+    }
+
+    .btn-accueil button {
+
+        min-height: 46px;
+
+        font-size: 14px;
+
+        padding: 0 12px;
+    }
+}

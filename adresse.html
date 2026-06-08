@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mouvement</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="style-adresse.css">
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/ASLOGOV1.PNG"
+    >
+</head>
+
+<body>
+
+<a href="accueil.html" class="btn-accueil">
+    <button>
+        <img
+            src="images/accueil2-blanc.png"
+            class="logo-action"
+        >
+        <span>Accueil</span>
+    </button>
+</a>
+
+<div class="btn-retour" id="btnRetour" style="display:none;">
+
+    <button onclick="retourEtape1()">
+        <img
+            src="images/retour-blanc.png"
+            class="logo-action"
+        >
+        <span>Retour</span>
+    </button>
+
+</div>
+
+<a href="infos.html" class="btn-infos">
+    <img src="images/INFOS-BLANC.png" alt="Infos">
+</a>
+
+<h1>MOUVEMENT</h1>
+
+<h2 id="titreEtape">Choix du mouvement</h2>
+
+<div class="zone-principale">
+
+    <!-- ===============================
+         ÉTAPE 1 : CHOIX TYPE
+    =============================== -->
+    <div id="blocChoix">
+
+        <div class="ligne-validation">
+
+            <button onclick="choisirType('RECEPTION - RESERVE')">
+                <span>Réception - Réserve</span>
+                <img
+                    src="images/entre-blanc.png"
+                    class="logo-bouton"
+                >
+            </button>
+
+            <button onclick="choisirType('RESERVE - RESERVE')">
+                <span>Réserve - Réserve</span>
+                <img
+                    src="images/entre-blanc.png"
+                    class="logo-bouton"
+                >
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ===============================
+         ÉTAPE 2 : NUMÉRO INTERNE
+    =============================== -->
+    <div id="blocPalette" style="display:none;">
+
+        <h3 id="texteChoix"></h3>
+
+        <div class="ligne-validation">
+
+            <input 
+                type="text"
+                id="palette"
+                placeholder="Numéro interne"
+                maxlength="3"
+                inputmode="numeric"
+                autocapitalize="off"
+                autocorrect="off"
+                spellcheck="false"
+                autocomplete="off"
+                oninput="verifPalette(this); verifierPalette();"
+            >
+
+            <button id="btnCheck" disabled>
+                <img
+                    src="images/croix.png"
+                    class="logo-check"
+                >
+            </button>
+
+        </div>
+
+        <div class="ligne-validation" style="margin-top:15px;">
+
+            <button
+                id="btnFichier"
+                onclick="creerFichier()"
+                disabled
+            >
+                <span>Créer fichier</span>
+                <img
+                    src="images/entre-blanc.png"
+                    class="logo-bouton"
+                >
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script type="module">
+
+import { ajouterHistorique } from "./historique.js";
+
+if (!localStorage.getItem("utilisateur")) { window.location.href = "index.html"; }
+
+// ===============================
+// VARIABLES
+// ===============================
+let typeChoisi = "";
+
+
+// ===============================
+// ÉTAPE 1 : CHOIX TYPE
+// ===============================
+function choisirType(type) {
+
+    typeChoisi = type;
+
+    document.getElementById("titreEtape").innerText =
+        "Création fichier";
+
+    document.getElementById("texteChoix").innerText =
+        type;
+
+    document.getElementById("blocChoix").style.display =
+        "none";
+
+    document.getElementById("blocPalette").style.display =
+        "block";
+        
+    document.getElementById("btnRetour").style.display =
+        "block";
+}
+
+
+// ===============================
+// RETOUR ÉTAPE 1
+// ===============================
+function retourEtape1() {
+
+    // Cache étape 2
+    document.getElementById("blocPalette").style.display =
+        "none";
+
+    // Réaffiche étape 1
+    document.getElementById("blocChoix").style.display =
+        "block";
+
+    // Cache bouton retour
+    document.getElementById("btnRetour").style.display =
+        "none";
+
+    // Remet titre initial
+    document.getElementById("titreEtape").innerText =
+        "Choix du mouvement";
+
+    // Réinitialise choix
+    typeChoisi = "";
+
+    // Reset champ palette
+    document.getElementById("palette").value = "";
+
+    // Reset bouton check
+    document.getElementById("btnCheck").innerHTML =
+    `
+    <img
+        src="images/croix.png"
+        class="logo-check"
+    >
+    `;
+
+    // Reset bouton création
+    document.getElementById("btnFichier").disabled =
+        true;
+
+    // Reset texte
+    document.getElementById("texteChoix").innerText =
+        "";
+}
+
+
+// ===============================
+// CONTRÔLE INPUT NUMÉRO INTERNE
+// ===============================
+function verifPalette(champ) {
+
+    champ.value =
+        champ.value.replace(/[^0-9]/g, '');
+
+    if (champ.value.length > 3) {
+
+        champ.value =
+            champ.value.slice(0, 3);
+    }
+}
+
+
+// ===============================
+// CHECK VISUEL
+// ===============================
+function verifierPalette() {
+
+    let champPalette =
+        document.getElementById("palette");
+
+    let valeur =
+        champPalette.value;
+
+    let boutonCheck =
+        document.getElementById("btnCheck");
+
+    let btnFichier =
+        document.getElementById("btnFichier");
+
+    let estValide =
+        /^\d{3}$/.test(valeur);
+
+    if (estValide) {
+
+        boutonCheck.innerHTML =
+        `
+        <img
+            src="images/verifier.png"
+            class="logo-check"
+        >
+        `;
+
+        btnFichier.disabled = false;
+
+        champPalette.blur();
+
+    } else {
+
+        boutonCheck.innerHTML =
+        `
+        <img
+            src="images/croix.png"
+            class="logo-check"
+        >
+        `;
+
+        btnFichier.disabled = true;
+    }
+}
+
+
+// ===============================
+// CRÉATION DU FICHIER
+// ===============================
+async function creerFichier() {
+
+    let palette =
+        document.getElementById("palette").value;
+
+    if (!/^\d{3}$/.test(palette)) {
+
+        alert("Numéro interne invalide");
+
+        return;
+    }
+
+    let today = new Date();
+
+    let jour =
+        String(today.getDate()).padStart(2, '0');
+
+    let mois =
+        String(today.getMonth() + 1).padStart(2, '0');
+
+    let annee =
+        today.getFullYear();
+
+    let date =
+        jour + "/" + mois + "/" + annee;
+
+    await ajouterHistorique(
+        "Création préparation mouvement",
+        palette,
+        {
+            palette: palette,
+            mouvement: typeChoisi,
+            type: "adresse"
+        }
+    );
+
+    window.location.href =
+        "adresse-scan.html?palette=" + palette +
+        "&commentaire=" + encodeURIComponent(typeChoisi) +
+        "&date=" + date;
+}
+
+
+// ===============================
+// GESTION CLAVIER
+// ===============================
+document.getElementById("palette")
+.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        this.blur();
+    }
+});
+
+window.choisirType = choisirType;
+window.retourEtape1 = retourEtape1;
+window.verifPalette = verifPalette;
+window.verifierPalette = verifierPalette;
+window.creerFichier = creerFichier;
+
+</script>
+
+<script type="module" src="maintenance.js"></script>
+
+</body>
+</html>
