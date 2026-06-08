@@ -13,13 +13,18 @@
 
 <body>
 
-<button
-    class="btn-accueil"
-    onclick="window.location.href='accueil.html'"
->
-    <img src="images/accueil2-blanc.png" class="logo-action">
-    <span>Accueil</span>
-</button>
+<div class="btn-accueil">
+
+    <button onclick="window.location.href='accueil.html'">
+        <img
+            src="images/accueil2-blanc.png"
+            class="logo-action"
+        >
+        <span>Accueil</span>
+
+    </button>
+
+</div>
 
 <div class="btn-retour" id="btnRetour" style="display:none;">
 
@@ -355,14 +360,14 @@ document.getElementById("palette")
 // ===============================
 // GESTION INFOS
 // ===============================
-async function ouvrirInfos() {
+function ouvrirInfos() {
 
     document
         .getElementById("popupInfos")
         .classList.add("active");
 }
 
-async function fermerInfos() {
+function fermerInfos() {
 
     document
         .getElementById("popupInfos")
