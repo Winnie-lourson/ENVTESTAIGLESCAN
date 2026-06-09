@@ -26,7 +26,8 @@
 
 </div>
 
-<a class="btn-retour" id="btnRetour">
+<div class="btn-retour" id="btnRetour" style="display:none;">
+
     <button onclick="retourEtape1()">
         <img
             src="images/retour-blanc.png"
@@ -34,11 +35,12 @@
         >
         <span>Retour</span>
     </button>
-</a>
 
-<a href="infos.html" class="btn-infos">
+</div>
+
+<div class="btn-infos" onclick="ouvrirInfos()">
     <img src="images/INFOS-BLANC.png" alt="Infos">
-</a>
+</div>
 
 <h1>EXPÉDITION</h1>
 
@@ -133,6 +135,33 @@
         </button>
 
     </div>
+
+</div>
+
+<div id="popupInfos" class="popup-infos">
+
+    <div class="popup-contenu">
+
+        <div class="popup-header">
+
+            <button
+                class="btn-fermer"
+                onclick="fermerInfos()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+        <iframe
+            src="infos-expedition-scan.html"
+            id="iframeInfos"
+        >
+        </iframe>
+
+    </div>
+
+</div>
 
 <script type="module">
 
@@ -701,6 +730,26 @@ async function finDeScan() {
 
 }
 
+
+// ===============================
+// GESTION INFOS
+// ===============================
+function ouvrirInfos() {
+
+    document
+        .getElementById("popupInfos")
+        .classList.add("active");
+}
+
+function fermerInfos() {
+
+    document
+        .getElementById("popupInfos")
+        .classList.remove("active");
+}
+
+window.ouvrirInfos = ouvrirInfos;
+window.fermerInfos = fermerInfos;
 window.validerSupport = validerSupport;
 window.verifierSupport = verifierSupport;
 window.verifierBT = verifierBT;
