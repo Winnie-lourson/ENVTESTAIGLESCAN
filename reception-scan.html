@@ -28,7 +28,7 @@
 
 <div class="btn-retour" id="btnRetour">
 
-    <button onclick="retourEtape1()">
+    <button onclick="window.location.href='reception.html'">
         <img
             src="images/retour-blanc.png"
             class="logo-action"
@@ -226,6 +226,8 @@ async function validerSupport() {
     document.getElementById("blocSupport").style.display = "none";
 
     document.getElementById("blocBT").style.display = "block";
+
+    document.getElementById("btnRetour").style.display = "none";
 
     document.getElementById("bt").focus();
 }
