@@ -38,9 +38,9 @@
 
 </div>
 
-<a href="infos.html" class="btn-infos">
+<div class="btn-infos" onclick="ouvrirInfos()">
     <img src="images/INFOS-BLANC.png" alt="Infos">
-</a>
+</div>
 
 <h1>EXPÉDITION</h1>
 
@@ -80,7 +80,7 @@
     <!-- ÉTAPE 2 -->
     <div id="blocPalette" style="display:none; margin-top:20px;">
 
-        <div class="ligne-validation">
+        <div class="ligne-check">
             <input 
                 type="text"
                 id="palette"
@@ -117,6 +117,31 @@
             </button>
 
         </div>
+
+    </div>
+
+</div>
+
+<div id="popupInfos" class="popup-infos">
+
+    <div class="popup-contenu">
+
+        <div class="popup-header">
+
+            <button
+                class="btn-fermer"
+                onclick="fermerInfos()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+        <iframe
+            src="infos-reception.html"
+            id="iframeInfos"
+        >
+        </iframe>
 
     </div>
 
@@ -328,6 +353,26 @@ document.getElementById("palette")
     }
 });
 
+
+// ===============================
+// GESTION INFOS
+// ===============================
+function ouvrirInfos() {
+
+    document
+        .getElementById("popupInfos")
+        .classList.add("active");
+}
+
+function fermerInfos() {
+
+    document
+        .getElementById("popupInfos")
+        .classList.remove("active");
+}
+
+window.ouvrirInfos = ouvrirInfos;
+window.fermerInfos = fermerInfos;
 window.validerCommentaire = validerCommentaire;
 window.retourEtape1 = retourEtape1;
 window.verifPalette = verifPalette;

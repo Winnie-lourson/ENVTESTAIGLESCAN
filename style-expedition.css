@@ -76,7 +76,7 @@ h2 {
     justify-content: center;
 
     background:
-        rgba(37,99,235,0.12);
+        rgba(37,99,235,.12);
 
     color: #2563eb;
 
@@ -91,6 +91,7 @@ h2 {
     margin-bottom: 25px;
 
     text-align: center;
+
 }
 
 /* ========================================
@@ -171,6 +172,22 @@ input::placeholder {
     width: 100%;
 }
 
+.ligne-check {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    width: 100%;
+}
+
+.ligne-check input {
+
+    flex: 1;
+}
+
 /* ========================================
    BOUTONS
 ======================================== */
@@ -228,14 +245,27 @@ button:active {
 
 #btnCheck {
 
-    background:
-        rgba(255,255,255,0.95);
+    background: transparent;
 
-    border: 2px solid #e2e8f0;
+    border: none;
 
-    cursor: default;
+    padding: 0;
+
+    margin: 0;
+
+    width: 36px;
+
+    min-width: 36px;
+
+    height: 36px;
+
+    min-height: 36px;
 
     pointer-events: none;
+
+    box-shadow: none;
+
+    flex-shrink: 0;
 }
 
 #btnCheck:hover {
@@ -243,13 +273,15 @@ button:active {
     transform: none;
 
     box-shadow: none;
+
+    background: transparent;
 }
 
 .logo-check {
 
-    width: 32px;
+    width: 36px;
 
-    height: 32px;
+    height: 36px;
 
     object-fit: contain;
 }
@@ -281,15 +313,11 @@ button:active {
 }
 
 .btn-accueil button,
-.btn-retour button{
+.btn-retour button {
 
-    min-height:52px;
+    min-height: 52px;
 
-    padding:0 18px;
-
-    border:none;
-
-    border-radius:14px;
+    padding: 0 18px;
 
     background:
         linear-gradient(
@@ -298,32 +326,7 @@ button:active {
             #1e40af
         );
 
-    color:white;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:12px;
-
-    font-size:18px;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.3s;
-}
-
-.btn-accueil button:hover,
-.btn-retour button:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 8px 18px rgba(0,0,0,.15);
+    border-radius: 14px;
 }
 
 /* ========================================
@@ -392,6 +395,85 @@ button:active {
     height: 18px;
 
     object-fit: contain;
+}
+
+/* ========================================
+   POPUP INFOS
+======================================== */
+
+.popup-infos {
+
+    display: none;
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0,0,0,0.6);
+
+    z-index: 5000;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-infos.active {
+
+    display: flex;
+}
+
+.popup-contenu {
+
+    width: 95%;
+    height: 90%;
+
+    background: white;
+
+    border-radius: 16px;
+
+    overflow: hidden;
+}
+
+.popup-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 15px;
+
+    background: #0f2d62;
+
+    color: white;
+}
+
+.btn-fermer {
+
+    background: transparent;
+
+    border: none;
+
+    color: white;
+
+    font-size: 24px;
+
+    cursor: pointer;
+}
+
+#iframeInfos,
+.popup-contenu iframe {
+
+    width: 100%;
+
+    height: calc(100% - 60px);
+
+    border: none;
 }
 
 /* ========================================
@@ -516,26 +598,14 @@ button:active {
         height: 24px;
     }
 
-    #blocPalette .ligne-validation:first-child {
-
-        flex-direction: row;
-
-        align-items: center;
-    }
-
-    #blocPalette .ligne-validation:first-child input {
-
-        flex: 1;
-    }
-
     #btnCheck {
 
-        width: 58px;
+        width: 36px;
 
-        min-width: 58px;
+        min-width: 36px;
 
-        height: 58px;
+        height: 36px;
 
-        min-height: 58px;
+        min-height: 36px;
     }
 }
