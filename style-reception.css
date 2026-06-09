@@ -168,7 +168,21 @@ input::placeholder {
 
     display: flex;
 
-    flex-direction: row;
+    flex-direction: column;
+
+    gap: 15px;
+
+    width: 100%;
+}
+
+.ligne-validation input {
+
+    flex: 1;
+}
+
+.ligne-check {
+
+    display: flex;
 
     align-items: center;
 
@@ -177,7 +191,7 @@ input::placeholder {
     width: 100%;
 }
 
-.ligne-validation input {
+.ligne-check input {
 
     flex: 1;
 }
