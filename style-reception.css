@@ -175,11 +175,6 @@ input::placeholder {
     width: 100%;
 }
 
-.ligne-validation input {
-
-    flex: 1;
-}
-
 .ligne-check {
 
     display: flex;
