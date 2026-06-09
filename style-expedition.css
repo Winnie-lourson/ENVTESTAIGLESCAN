@@ -69,7 +69,7 @@ h2 {
 
 #texteCommentaire {
 
-    display: inline-flex;
+    display: flex;
 
     align-items: center;
 
@@ -78,7 +78,7 @@ h2 {
     background:
         rgba(37,99,235,0.12);
 
-    color: #1e40af;
+    color: #2563eb;
 
     border-radius: 999px;
 
