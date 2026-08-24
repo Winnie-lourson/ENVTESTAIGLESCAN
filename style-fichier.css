@@ -590,15 +590,13 @@ h3 {
     display: grid;
 
     grid-template-columns:
-        140px
-        minmax(250px, 1fr)
-        130px
-        120px
-        auto;
+    140px
+    minmax(250px, 1fr)
+    110px
+    90px
+    auto;
 
-    align-items: center;
-
-    gap: 18px;
+    gap: 10px;
 
     box-shadow:
         0 4px 12px rgba(0,0,0,0.06);
