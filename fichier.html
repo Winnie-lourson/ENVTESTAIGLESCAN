@@ -42,6 +42,8 @@
 
     <button onclick="filtrerFichiers('adresse')">Mouvement</button>
 
+    <button onclick="filtrerFichiers('archives')">Archives</button>
+
 </div>
 
 <div id="bibliotheque"></div>
@@ -55,7 +57,8 @@ import {
     collection,
     getDocs,
     deleteDoc,
-    doc
+    doc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 if (!localStorage.getItem("utilisateur")) { window.location.href = "index.html"; }
@@ -88,6 +91,17 @@ async function chargerBibliotheque() {
 
         });
 
+        bibliotheque.sort((a, b) =>
+            (a.nom || "").localeCompare(
+                (b.nom || ""),
+                "fr",
+                {
+                    numeric: true,
+                    sensitivity: "base"
+                }
+            )
+        );
+
         afficherFichiers("tous");
 
     } catch (error) {
@@ -109,10 +123,24 @@ function afficherFichiers(type) {
 
     let fichiersFiltres = bibliotheque;
 
-    if (type !== "tous") {
+    if (type === "tous") {
 
         fichiersFiltres = bibliotheque.filter(
-            fichier => fichier.type === type
+            fichier => fichier.archive !== true
+        );
+
+    } else if (type === "archives") {
+
+        fichiersFiltres = bibliotheque.filter(
+            fichier => fichier.archive === true
+        );
+
+    } else {
+
+        fichiersFiltres = bibliotheque.filter(
+            fichier =>
+                fichier.type === type &&
+                fichier.archive !== true
         );
     }
 
@@ -192,13 +220,35 @@ function afficherFichiers(type) {
                     <span>Excel</span>
                 </button>
 
-                <button onclick="supprimerFichier(${vraiIndex})">
-                    <img
-                        src="images/supprimer-blanc.png"
-                        class="logo-action-fichier"
-                    >
-                    <span>Supprimer</span>
-                </button>
+                ${
+                    fichier.archive === true
+                        ? `
+                            <button onclick="desarchiverFichier(${vraiIndex})">
+                                <img
+                                    src="images/desarchiver-blanc.png"
+                                    class="logo-action-fichier"
+                                >
+                                <span>Désarchiver</span>
+                            </button>
+                        `
+                        : `
+                            <button onclick="archiverFichier(${vraiIndex})">
+                                <img
+                                    src="images/archiver-blanc.png"
+                                    class="logo-action-fichier"
+                                >
+                                <span>Archiver</span>
+                            </button>
+
+                            <button onclick="supprimerFichier(${vraiIndex})">
+                                <img
+                                    src="images/supprimer-blanc.png"
+                                    class="logo-action-fichier"
+                                >
+                                <span>Supprimer</span>
+                            </button>
+                        `
+                }
 
             </div>
         `;
@@ -277,8 +327,9 @@ async function extraireFichier(index) {
     if (fichier.type === "adresse") {
 
         data.push([
-            "Numéro support",
-            "Adresse"
+            "Colis",
+            "support",
+            "Date"
         ]);
 
         fichier.contenu.forEach(scan => {
@@ -295,8 +346,8 @@ async function extraireFichier(index) {
         // TYPE RÉCEPTION / EXPÉDITION
         // ===============================
         data.push([
-            "Numéro support",
-            "Numéro BT",
+            "Colis",
+            "support",
             "Date"
         ]);
 
@@ -343,7 +394,7 @@ async function extraireFichier(index) {
     XLSX.utils.book_append_sheet(
         workbook,
         worksheet,
-        "Scans"
+        "Data"
     );
 
     // ===============================
@@ -359,6 +410,118 @@ async function extraireFichier(index) {
         workbook,
         nomFichier + ".xlsx"
     );
+}
+
+
+// ===============================
+// ARCHIVE FICHIERS
+// ===============================
+async function archiverFichier(index) {
+
+    let fichier = bibliotheque[index];
+
+    if (!fichier) {
+        alert("❌ Fichier introuvable");
+        return;
+    }
+
+    if (!confirm(
+        "Voulez-vous archiver le fichier :\n\n" +
+        fichier.nom +
+        " ?"
+    )) {
+        return;
+    }
+
+    try {
+
+        await updateDoc(
+            doc(db, "fichiersScans", fichier.id),
+            {
+                archive: true
+            }
+        );
+
+        await ajouterHistorique(
+            "Archivage fichier",
+            fichier.nom,
+            {
+                type: fichier.type,
+                totalScans: fichier.totalScans
+            }
+        );
+
+        alert("✅ Fichier archivé");
+
+        await chargerBibliotheque();
+
+    } catch (error) {
+
+        console.error(
+            "Erreur archivage Firebase :",
+            error
+        );
+
+        alert(
+            "❌ Erreur lors de l'archivage"
+        );
+    }
+}
+
+
+// ===============================
+// DEARCHIVE FICHIERS
+// ===============================
+async function desarchiverFichier(index) {
+
+    let fichier = bibliotheque[index];
+
+    if (!fichier) {
+        alert("❌ Fichier introuvable");
+        return;
+    }
+
+    if (!confirm(
+        "Voulez-vous désarchiver le fichier :\n\n" +
+        fichier.nom +
+        " ?"
+    )) {
+        return;
+    }
+
+    try {
+
+        await updateDoc(
+            doc(db, "fichiersScans", fichier.id),
+            {
+                archive: false
+            }
+        );
+
+        await ajouterHistorique(
+            "Désarchivage fichier",
+            fichier.nom,
+            {
+                type: fichier.type,
+                totalScans: fichier.totalScans
+            }
+        );
+
+        alert("✅ Fichier désarchivé");
+
+        await chargerBibliotheque();
+
+    } catch (error) {
+
+        console.error(
+            "Erreur désarchivage Firebase :",
+            error
+        );
+
+        alert(
+            "❌ Erreur lors du désarchivage"
+        );
+    }
 }
 
 
@@ -405,6 +568,8 @@ window.afficherFichiers = afficherFichiers;
 window.filtrerFichiers = filtrerFichiers;
 window.voirFichier = voirFichier;
 window.extraireFichier = extraireFichier;
+window.extraireFichier = archiverFichier;
+window.extraireFichier = desarchiverFichier;
 window.supprimerFichier = supprimerFichier;
 
 </script>
