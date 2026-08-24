@@ -668,6 +668,8 @@ h3 {
 
     grid-column: 3;
 
+    grid-row: 1;
+
     justify-self: start;
 
     width: 100%;
@@ -705,6 +707,12 @@ h3 {
 
 .fichier-archive .fichier-date {
 
+    grid-column: 2;
+
+    grid-row: 1;
+
+    justify-self: start;
+
     font-size: 13px;
 
     color: #64748b;
@@ -712,8 +720,13 @@ h3 {
     white-space: nowrap;
 }
 
-
 .fichier-archive .fichier-total {
+
+    grid-column: 4;
+
+    grid-row: 1;
+
+    justify-self: start;
 
     font-size: 13px;
 
@@ -727,6 +740,10 @@ h3 {
 
 .fichier-archive .fichier-actions {
 
+    grid-column: 5;
+
+    grid-row: 1;
+
     display: flex;
 
     flex-wrap: nowrap;
@@ -737,7 +754,6 @@ h3 {
 
     justify-content: flex-end;
 }
-
 
 .fichier-archive .fichier-actions button {
 
