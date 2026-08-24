@@ -42,7 +42,12 @@
 
     <button onclick="filtrerFichiers('adresse')">Mouvement</button>
 
-    <button onclick="filtrerFichiers('archives')">Archives</button>
+    <button
+        class="btn-archives"
+        onclick="filtrerFichiers('archives')"
+    >
+        Archives
+    </button>
 
 </div>
 
@@ -223,7 +228,10 @@ function afficherFichiers(type) {
                 ${
                     fichier.archive === true
                         ? `
-                            <button onclick="desarchiverFichier(${vraiIndex})">
+                            <button
+                                class="btn-archiver"
+                                onclick="desarchiverFichier(${vraiIndex})"
+                            >
                                 <img
                                     src="images/desarchiver-blanc.png"
                                     class="logo-action-fichier"
@@ -232,7 +240,10 @@ function afficherFichiers(type) {
                             </button>
                         `
                         : `
-                            <button onclick="archiverFichier(${vraiIndex})">
+                            <button
+                                class="btn-archiver"
+                                onclick="archiverFichier(${vraiIndex})"
+                            >
                                 <img
                                     src="images/archiver-blanc.png"
                                     class="logo-action-fichier"

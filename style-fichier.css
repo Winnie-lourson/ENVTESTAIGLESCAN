@@ -535,6 +535,26 @@ h3 {
 }
 
 /* ========================================
+   ARCHIVAGE - PC UNIQUEMENT
+======================================== */
+
+.btn-archiver {
+    display: flex;
+}
+
+.btn-archives {
+    display: block;
+}
+
+@media (max-width: 900px) {
+
+    .btn-archiver {
+        display: none !important;
+    }
+
+}
+
+/* ========================================
    TABLETTE
 ======================================== */
 
