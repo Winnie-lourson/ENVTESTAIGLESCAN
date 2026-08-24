@@ -181,6 +181,10 @@ function afficherFichiers(type) {
             "type-" + typeLabel
         );
 
+        if (type === "archives") {
+            bloc.classList.add("fichier-archive");
+        }
+
         bloc.innerHTML = `
 
             <div class="fichier-top">
