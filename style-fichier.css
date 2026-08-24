@@ -548,7 +548,8 @@ h3 {
 
 @media (max-width: 900px) {
 
-    .btn-archiver {
+    .btn-archiver,
+    .btn-archives {
         display: none !important;
     }
 
