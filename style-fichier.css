@@ -220,8 +220,8 @@ h1 {
     background:
     linear-gradient(
         135deg,
-        #D97706,
-        #F59E0B
+        #475569,
+        #64748B
     );
 }
 
@@ -657,6 +657,7 @@ h3 {
 
 @media screen and (max-width: 900px) {
 
+    .btn-excel,
     .btn-archiver,
     .btn-archives {
         display: none !important;
