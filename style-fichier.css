@@ -535,27 +535,6 @@ h3 {
 }
 
 /* ========================================
-   ARCHIVAGE - PC UNIQUEMENT
-======================================== */
-
-.btn-archiver {
-    display: flex;
-}
-
-.btn-archives {
-    display: block;
-}
-
-@media (max-width: 900px) {
-
-    .btn-archiver,
-    .btn-archives {
-        display: none !important;
-    }
-
-}
-
-/* ========================================
    TABLETTE
 ======================================== */
 
@@ -660,4 +639,23 @@ h3 {
 
         padding: 0 12px;
     }
+}
+
+/* ========================================
+   ARCHIVAGE - PC UNIQUEMENT
+======================================== */
+
+.btn-archiver,
+.btn-archives {
+    display: flex;
+}
+
+/* Tablette + PDA */
+@media screen and (max-width: 1024px) {
+
+    .btn-archiver,
+    .btn-archives {
+        display: none !important;
+    }
+
 }
