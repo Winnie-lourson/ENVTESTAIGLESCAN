@@ -590,13 +590,15 @@ h3 {
     display: grid;
 
     grid-template-columns:
-    140px
-    minmax(250px, 1fr)
-    110px
-    90px
-    auto;
+        170px
+        120px
+        minmax(300px, 1fr)
+        100px
+        auto;
 
-    gap: 10px;
+    align-items: center;
+
+    gap: 12px;
 
     box-shadow:
         0 4px 12px rgba(0,0,0,0.06);
@@ -648,6 +650,58 @@ h3 {
     display: contents;
 }
 
+/* ========================================
+   POSITION DES ELEMENTS ARCHIVES
+======================================== */
+
+/* Date */
+.fichier-archive .fichier-date {
+
+    grid-column: 2;
+
+    justify-self: start;
+}
+
+
+/* Nom du fichier */
+.fichier-archive h3 {
+
+    grid-column: 3;
+
+    justify-self: start;
+
+    width: 100%;
+
+    margin: 0;
+
+    font-size: 17px;
+
+    line-height: 1.2;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* Nombre de colis */
+.fichier-archive .fichier-total {
+
+    grid-column: 4;
+
+    justify-self: start;
+}
+
+
+/* Boutons */
+.fichier-archive .fichier-actions {
+
+    grid-column: 5;
+
+    justify-self: end;
+}
 
 .fichier-archive .fichier-date {
 
