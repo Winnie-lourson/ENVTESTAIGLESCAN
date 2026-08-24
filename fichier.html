@@ -107,7 +107,11 @@ async function chargerBibliotheque() {
             )
         );
 
-        afficherFichiers("tous");
+        const filtreSauvegarde =
+            localStorage.getItem("filtreFichiers") || "tous";
+
+        afficherFichiers(filtreSauvegarde);
+        mettreAJourFiltreActif(filtreSauvegarde);
 
     } catch (error) {
 
@@ -277,7 +281,51 @@ function afficherFichiers(type) {
 // ===============================
 function filtrerFichiers(type) {
 
+    // Mémorise le filtre
+    localStorage.setItem(
+        "filtreFichiers",
+        type
+    );
+
+    // Affiche les fichiers
     afficherFichiers(type);
+
+    // Met à jour le bouton actif
+    mettreAJourFiltreActif(type);
+}
+
+
+// ===============================
+// FILTRE ACTIF
+// ===============================
+function mettreAJourFiltreActif(type) {
+
+    const boutons =
+        document.querySelectorAll(
+            ".filtres-types button"
+        );
+
+    boutons.forEach(bouton => {
+
+        bouton.classList.remove(
+            "filtre-actif"
+        );
+
+    });
+
+    boutons.forEach(bouton => {
+
+        if (
+            bouton.getAttribute("onclick") ===
+            `filtrerFichiers('${type}')`
+        ) {
+
+            bouton.classList.add(
+                "filtre-actif"
+            );
+        }
+
+    });
 }
 
 

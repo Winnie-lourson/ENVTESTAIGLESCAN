@@ -195,6 +195,28 @@ h1 {
         0 10px 20px rgba(37,99,235,0.25);
 }
 
+/* ========================================
+   FILTRE ACTIF
+======================================== */
+
+.filtres-types button.filtre-actif {
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f2d62,
+            #172554
+        );
+
+    box-shadow:
+        0 6px 16px rgba(15,45,98,0.30);
+
+    transform: translateY(-2px);
+
+    border:
+        2px solid rgba(255,255,255,0.35);
+}
+
 .fichier-actions button:nth-child(1) {
 
     background:
