@@ -563,12 +563,12 @@ button:active {
 
     #btnCheck {
 
-        width: 58px;
+        width: 36px;
 
-        min-width: 58px;
+        min-width: 36px;
 
-        height: 58px;
+        height: 36px;
 
-        min-height: 58px;
+        min-height: 36px;
     }
 }
