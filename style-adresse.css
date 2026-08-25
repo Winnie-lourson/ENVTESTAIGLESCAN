@@ -67,9 +67,9 @@ h2 {
    COMMENTAIRE VALIDÉ
 ======================================== */
 
-#texteCommentaire {
+#texteChoix {
 
-    display: inline-flex;
+    display: flex;
 
     align-items: center;
 
@@ -78,7 +78,7 @@ h2 {
     background:
         rgba(37,99,235,0.12);
 
-    color: #1e40af;
+    color: #2563eb;
 
     border-radius: 999px;
 
@@ -89,6 +89,8 @@ h2 {
     font-weight: 700;
 
     margin-bottom: 25px;
+
+    text-align: center;
 }
 
 /* ========================================
@@ -167,6 +169,22 @@ input::placeholder {
     gap: 15px;
 
     width: 100%;
+}
+
+.ligne-check {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    width: 100%;
+}
+
+.ligne-check input {
+
+    flex: 1;
 }
 
 /* ========================================
