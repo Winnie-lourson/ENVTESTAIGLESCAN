@@ -167,7 +167,14 @@ if (fichier.type === "adresse") {
     document.querySelector("#tableHistorique thead tr").innerHTML = `
         <th>Numéro support</th>
         <th>Adresse</th>
-        <th>Action</th>
+    `;
+
+} else if (fichier.archive === true) {
+
+    document.querySelector("#tableHistorique thead tr").innerHTML = `
+        <th>Numéro support</th>
+        <th>Numéro BT</th>
+        <th>Date</th>
     `;
 
 } else {
@@ -204,11 +211,11 @@ fichier.contenu.forEach(scan => {
             <td>${scan.bt || "-"}</td>
             <td>${scan.date || "-"}</td>
 
-            <td>
-                ${
-                    fichier.archive === true
-                        ? ""
-                        : `
+            ${
+                fichier.archive === true
+                    ? ""
+                    : `
+                        <td>
                             <button
                                 class="btn-supprimer"
                                 onclick="supprimerLigne('${scan.bt}')"
@@ -218,9 +225,9 @@ fichier.contenu.forEach(scan => {
                                     class="logo-supprimer"
                                 >
                             </button>
-                        `
-                }
-            </td>
+                        </td>
+                    `
+            }
         `;
     }
 
