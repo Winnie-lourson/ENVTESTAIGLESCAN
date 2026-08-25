@@ -403,7 +403,7 @@ async function extraireFichier(index) {
             data.push([
                 scan.support || "",
                 (scan.adresse || "").replace(/-/g, ""),
-                scan.date || ""
+                scan.dateCreation || ""
             ]);
         });
 
@@ -645,7 +645,6 @@ window.supprimerFichier = supprimerFichier;
 </script>
 
 <script type="module" src="maintenance.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 </body>
 </html>

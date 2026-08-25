@@ -141,9 +141,12 @@ document.getElementById("nomFichier").innerText = fichier.nom;
 
 
 // ===============================
-// MASQUER AJOUT POUR ADRESSE
+// MASQUER AJOUT SI ARCHIVÉ OU POUR MOUVEMENT
 // ===============================
-if (fichier.type === "adresse") {
+if (
+    fichier.type === "adresse" ||
+    fichier.archive === true
+) {
 
     document.querySelector(".zone-ajout").style.display =
         "none";
@@ -191,17 +194,7 @@ fichier.contenu.forEach(scan => {
         ligne.innerHTML = `
             <td>${scan.support || "-"}</td>
             <td>${scan.adresse || "-"}</td>
-            <td>
-                <button
-                    class="btn-supprimer"
-                    onclick="supprimerLigne('${scan.adresse}')"
-                >
-                    <img
-                        src="images/supprimer-rouge.png"
-                        class="logo-supprimer"
-                    >
-                </button>
-            </td>
+            <td></td>
         `;
 
     } else {
@@ -210,16 +203,23 @@ fichier.contenu.forEach(scan => {
             <td>${scan.support || "-"}</td>
             <td>${scan.bt || "-"}</td>
             <td>${scan.date || "-"}</td>
+
             <td>
-                <button
-                    class="btn-supprimer"
-                    onclick="supprimerLigne('${scan.bt}')"
-                >
-                    <img
-                        src="images/supprimer-rouge.png"
-                        class="logo-supprimer"
-                    >
-                </button>
+                ${
+                    fichier.archive === true
+                        ? ""
+                        : `
+                            <button
+                                class="btn-supprimer"
+                                onclick="supprimerLigne('${scan.bt}')"
+                            >
+                                <img
+                                    src="images/supprimer-rouge.png"
+                                    class="logo-supprimer"
+                                >
+                            </button>
+                        `
+                }
             </td>
         `;
     }

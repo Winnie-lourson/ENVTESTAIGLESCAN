@@ -323,6 +323,14 @@ h1 {
         0 16px 35px rgba(0,0,0,0.12);
 }
 
+.fichier-archive:hover {
+
+    transform: none;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,0.06);
+}
+
 /* ========================================
    BORDURES TYPES
 ======================================== */
