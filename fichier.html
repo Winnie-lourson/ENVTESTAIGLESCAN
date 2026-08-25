@@ -402,7 +402,8 @@ async function extraireFichier(index) {
 
             data.push([
                 scan.support || "",
-                (scan.adresse || "").replace(/-/g, "")
+                (scan.adresse || "").replace(/-/g, ""),
+                scan.date || ""
             ]);
         });
 
@@ -420,8 +421,8 @@ async function extraireFichier(index) {
         fichier.contenu.forEach(scan => {
 
             data.push([
-                scan.support || "",
                 scan.bt || "",
+                scan.support || "",
                 scan.date || ""
             ]);
         });
@@ -474,7 +475,10 @@ async function extraireFichier(index) {
     // ===============================
     XLSX.writeFile(
         workbook,
-        nomFichier + ".xlsx"
+        nomFichier + ".xls",
+        {
+            bookType: "biff8"
+        }
     );
 }
 
