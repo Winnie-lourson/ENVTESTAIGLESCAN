@@ -173,7 +173,14 @@ h2 {
 
     gap: 20px;
 
-    align-items: start;
+    align-items: stretch;
+
+    /* UNE SEULE BARRE DE DÉFILEMENT */
+    max-height: 75vh;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
 }
 
 
@@ -295,9 +302,6 @@ h2 {
 
     gap: 7px;
 
-    max-height: 70vh;
-
-    overflow-y: auto;
 }
 
 
@@ -554,36 +558,6 @@ h2 {
 }
 
 /* ========================================
-   SCROLLBAR DES COLONNES
-======================================== */
-
-.liste-fichiers::-webkit-scrollbar {
-
-    width: 7px;
-}
-
-
-.liste-fichiers::-webkit-scrollbar-track {
-
-    background: transparent;
-}
-
-
-.liste-fichiers::-webkit-scrollbar-thumb {
-
-    background: #cbd5e1;
-
-    border-radius: 10px;
-}
-
-
-.liste-fichiers::-webkit-scrollbar-thumb:hover {
-
-    background: #94a3b8;
-}
-
-
-/* ========================================
    TABLETTE
 ======================================== */
 
@@ -669,7 +643,7 @@ h2 {
 
     .liste-fichiers {
 
-        max-height: 350px;
+        padding: 10px;
     }
 
 
