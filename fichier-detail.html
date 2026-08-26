@@ -84,7 +84,7 @@
         >
     </button>
 
-    <div id="formAjout" style="display:none;">
+    <div id="formAjout">
 
         <input 
             type="text"
@@ -336,9 +336,11 @@ function afficherFormulaireAjout() {
     let form =
         document.getElementById("formAjout");
 
-    if (form.style.display === "none") {
+    if (form.style.display === "none" || 
+        form.style.display === ""
+    ) {
 
-        form.style.display = "block";
+        form.style.display = "flex";
         setTimeout(() => {
 
             document.getElementById("newBT").focus();
