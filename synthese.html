@@ -48,7 +48,6 @@
 
             </div>
 
-
             <div
                 id="listeReception"
                 class="liste-fichiers"
@@ -61,7 +60,6 @@
             </div>
 
         </section>
-
 
 
         <!-- ====================================
@@ -91,7 +89,6 @@
         </section>
 
 
-
         <!-- ====================================
              EXPÉDITION
         ===================================== -->
@@ -103,7 +100,6 @@
                 <h3>EXPÉDITION</h3>
 
             </div>
-
 
             <div
                 id="listeExpedition"
@@ -118,15 +114,12 @@
 
         </section>
 
-
     </main>
-
 
 
     <!-- ========================================
          FIREBASE + JAVASCRIPT
     ========================================= -->
-
     <script type="module">
 
         import { db } from "./firebase-config.js";
@@ -185,23 +178,20 @@
                 });
 
 
-                // ====================================
-                // TRI DU PLUS RÉCENT AU PLUS ANCIEN
-                // ====================================
+                // ========================================
+                // TRI ALPHABÉTIQUE PAR NOM
+                // ========================================
 
                 fichiers.sort((a, b) => {
 
-                    const dateA =
-                        convertirDate(
-                            a.dateCreation
-                        );
-
-                    const dateB =
-                        convertirDate(
-                            b.dateCreation
-                        );
-
-                    return dateB - dateA;
+                    return (a.nom || "").localeCompare(
+                        (b.nom || ""),
+                        "fr",
+                        {
+                            numeric: true,
+                            sensitivity: "base"
+                        }
+                    );
 
                 });
 
@@ -301,13 +291,35 @@
         }
 
 
+        // ========================================
+        // EXTRAIRE LE NUMÉRO DU FICHIER
+        // ========================================
+
+        function extraireNumeroFichier(nom) {
+
+            if (!nom) {
+                return null;
+            }
+
+
+            const correspondance =
+                nom.match(/^(\d{3})/);
+
+
+            if (!correspondance) {
+                return null;
+            }
+
+
+            return correspondance[1];
+
+        }
 
         // ========================================
-        // AFFICHAGE DES FICHIERS
+        // AFFICHAGE SYNCHRONISÉ DES FICHIERS
         // ========================================
 
         function afficherFichiers(fichiers) {
-
 
             const reception =
                 document.getElementById(
@@ -334,117 +346,283 @@
             expedition.innerHTML = "";
 
 
-            // ====================================
-            // COMPTEUR
-            // ====================================
+            // ========================================
+            // SÉPARATION PAR TYPE
+            // ========================================
 
-            let compteurReception = 0;
-
-            let compteurMouvement = 0;
-
-            let compteurExpedition = 0;
-
-
-            // ====================================
-            // PARCOURS DES FICHIERS
-            // ====================================
-
-            fichiers.forEach(fichier => {
+            const fichiersReception =
+                fichiers.filter(
+                    fichier =>
+                        fichier.type === "reception"
+                );
 
 
-                // ================================
-                // RÉCEPTION
-                // ================================
+            const fichiersMouvement =
+                fichiers.filter(
+                    fichier =>
+                        fichier.type === "adresse"
+                );
 
-                if (
-                    fichier.type === "reception"
-                ) {
 
-                    reception.appendChild(
-                        creerCarteFichier(
-                            fichier,
-                            "reception"
-                        )
+            const fichiersExpedition =
+                fichiers.filter(
+                    fichier =>
+                        fichier.type === "expedition"
+                );
+
+
+            // ========================================
+            // TRI PAR NOM
+            // ========================================
+
+            const trierParNom =
+                (a, b) =>
+                    (a.nom || "").localeCompare(
+                        (b.nom || ""),
+                        "fr",
+                        {
+                            numeric: true,
+                            sensitivity: "base"
+                        }
                     );
 
-                    compteurReception++;
+
+            fichiersReception.sort(trierParNom);
+
+            fichiersMouvement.sort(trierParNom);
+
+            fichiersExpedition.sort(trierParNom);
+
+
+            // ========================================
+            // CRÉATION D'UNE MAP PAR NUMÉRO
+            // ========================================
+
+            const mapReception = new Map();
+
+            const mapMouvement = new Map();
+
+            const mapExpedition = new Map();
+
+
+            fichiersReception.forEach(
+                fichier => {
+
+                    const numero =
+                        extraireNumeroFichier(
+                            fichier.nom
+                        );
+
+                    if (numero) {
+
+                        mapReception.set(
+                            numero,
+                            fichier
+                        );
+
+                    }
 
                 }
+            );
 
 
-                // ================================
-                // MOUVEMENT
-                // ================================
+            fichiersMouvement.forEach(
+                fichier => {
 
-                else if (
-                    fichier.type === "adresse"
-                ) {
+                    const numero =
+                        extraireNumeroFichier(
+                            fichier.nom
+                        );
 
-                    mouvement.appendChild(
-                        creerCarteFichier(
-                            fichier,
-                            "mouvement"
-                        )
-                    );
+                    if (numero) {
 
-                    compteurMouvement++;
+                        mapMouvement.set(
+                            numero,
+                            fichier
+                        );
 
-                }
-
-
-                // ================================
-                // EXPÉDITION
-                // ================================
-
-                else if (
-                    fichier.type === "expedition"
-                ) {
-
-                    expedition.appendChild(
-                        creerCarteFichier(
-                            fichier,
-                            "expedition"
-                        )
-                    );
-
-                    compteurExpedition++;
+                    }
 
                 }
+            );
 
-            });
+
+            fichiersExpedition.forEach(
+                fichier => {
+
+                    const numero =
+                        extraireNumeroFichier(
+                            fichier.nom
+                        );
+
+                    if (numero) {
+
+                        mapExpedition.set(
+                            numero,
+                            fichier
+                        );
+
+                    }
+
+                }
+            );
 
 
-            // ====================================
-            // MESSAGES SI VIDE
-            // ====================================
+            // ========================================
+            // RÉCUPÉRATION DE TOUS LES NUMÉROS
+            // ========================================
 
-            if (
-                compteurReception === 0
-            ) {
+            const numeros =
+                new Set([
+                    ...mapReception.keys(),
+                    ...mapMouvement.keys(),
+                    ...mapExpedition.keys()
+                ]);
+
+
+            // ========================================
+            // TRI DES NUMÉROS
+            // ========================================
+
+            const numerosTries =
+                Array.from(numeros).sort(
+                    (a, b) =>
+                        Number(a) - Number(b)
+                );
+
+
+            // ========================================
+            // CRÉATION DES 3 COLONNES
+            // ========================================
+
+            numerosTries.forEach(
+                numero => {
+
+
+                    // ----------------------------
+                    // RÉCEPTION
+                    // ----------------------------
+
+                    if (
+                        mapReception.has(numero)
+                    ) {
+
+                        reception.appendChild(
+                            creerCarteFichier(
+                                mapReception.get(numero),
+                                "reception"
+                            )
+                        );
+
+                    } else {
+
+                        reception.appendChild(
+                            creerFichierNonExistant()
+                        );
+
+                    }
+
+
+                    // ----------------------------
+                    // MOUVEMENT
+                    // ----------------------------
+
+                    if (
+                        mapMouvement.has(numero)
+                    ) {
+
+                        mouvement.appendChild(
+                            creerCarteFichier(
+                                mapMouvement.get(numero),
+                                "mouvement"
+                            )
+                        );
+
+                    } else {
+
+                        mouvement.appendChild(
+                            creerFichierNonExistant()
+                        );
+
+                    }
+
+
+                    // ----------------------------
+                    // EXPÉDITION
+                    // ----------------------------
+
+                    if (
+                        mapExpedition.has(numero)
+                    ) {
+
+                        expedition.appendChild(
+                            creerCarteFichier(
+                                mapExpedition.get(numero),
+                                "expedition"
+                            )
+                        );
+
+                    } else {
+
+                        expedition.appendChild(
+                            creerFichierNonExistant()
+                        );
+
+                    }
+
+                }
+            );
+
+            // ========================================
+            // FICHIER NON EXISTANT
+            // ========================================
+
+            function creerFichierNonExistant() {
+
+                const carte =
+                    document.createElement("div");
+
+
+                carte.className =
+                    "fichier-synthese fichier-inexistant";
+
+
+                const texte =
+                    document.createElement("div");
+
+
+                texte.className =
+                    "texte-fichier-inexistant";
+
+
+                texte.textContent =
+                    "Fichier non existant";
+
+
+                carte.appendChild(
+                    texte
+                );
+
+
+                return carte;
+
+            }
+
+            // ========================================
+            // SI AUCUN FICHIER
+            // ========================================
+
+            if (numerosTries.length === 0) {
 
                 reception.innerHTML =
                     `<p class="message-vide">
                         Aucun fichier
                     </p>`;
 
-            }
-
-
-            if (
-                compteurMouvement === 0
-            ) {
-
                 mouvement.innerHTML =
                     `<p class="message-vide">
                         Aucun fichier
                     </p>`;
-
-            }
-
-
-            if (
-                compteurExpedition === 0
-            ) {
 
                 expedition.innerHTML =
                     `<p class="message-vide">
