@@ -246,14 +246,14 @@ h3 {
 ======================================== */
 
 .zone-ajout {
-
     margin-top: 25px;
 
     display: flex;
-
     flex-direction: column;
 
     gap: 12px;
+
+    width: 100%;
 }
 
 #formAjout {
