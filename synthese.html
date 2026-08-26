@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Synthèse des fichiers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="style-synthese.css">
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/ASLOGOV1.png"
+    >
+</head>
+
+<body>
+
+
+    <div class="btn-accueil">
+
+        <button onclick="window.location.href='accueil.html'">
+            <img
+                src="images/accueil2-blanc.png"
+                class="logo-action"
+            >
+            <span>Accueil</span>
+
+        </button>
+
+    </div>
+
+    <h1>SYNTHÈSE</h1>
+
+    <h2>
+        Vue d'ensemble des fichiers
+    </h2>
+
+    <main class="zone-synthese">
+
+
+        <!-- ====================================
+             RÉCEPTION
+        ===================================== -->
+
+        <section class="colonne-fichiers colonne-reception">
+
+            <div class="titre-colonne">
+
+                <h3>RÉCEPTION</h3>
+
+            </div>
+
+
+            <div
+                id="listeReception"
+                class="liste-fichiers"
+            >
+
+                <p class="message-vide">
+                    Aucun fichier
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ====================================
+             MOUVEMENT
+        ===================================== -->
+
+        <section class="colonne-fichiers colonne-mouvement">
+
+            <div class="titre-colonne">
+
+                <h3>MOUVEMENT</h3>
+
+            </div>
+
+
+            <div
+                id="listeMouvement"
+                class="liste-fichiers"
+            >
+
+                <p class="message-vide">
+                    Aucun fichier
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ====================================
+             EXPÉDITION
+        ===================================== -->
+
+        <section class="colonne-fichiers colonne-expedition">
+
+            <div class="titre-colonne">
+
+                <h3>EXPÉDITION</h3>
+
+            </div>
+
+
+            <div
+                id="listeExpedition"
+                class="liste-fichiers"
+            >
+
+                <p class="message-vide">
+                    Aucun fichier
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- ========================================
+         FIREBASE + JAVASCRIPT
+    ========================================= -->
+
+    <script type="module">
+
+        import { db } from "./firebase-config.js";
+
+        import {
+            collection,
+            getDocs
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+        // ========================================
+        // VÉRIFICATION UTILISATEUR
+        // ========================================
+
+        if (!localStorage.getItem("utilisateur")) {
+
+            window.location.href = "index.html";
+
+        }
+
+
+        // ========================================
+        // RÉCUPÉRATION DES FICHIERS
+        // ========================================
+
+        async function chargerFichiers() {
+
+            try {
+
+                const snapshot =
+                    await getDocs(
+                        collection(
+                            db,
+                            "fichiersScans"
+                        )
+                    );
+
+
+                let fichiers = [];
+
+
+                snapshot.forEach(docSnapshot => {
+
+                    const fichier =
+                        docSnapshot.data();
+
+
+                    fichiers.push({
+
+                        id: docSnapshot.id,
+
+                        ...fichier
+
+                    });
+
+                });
+
+
+                // ====================================
+                // TRI DU PLUS RÉCENT AU PLUS ANCIEN
+                // ====================================
+
+                fichiers.sort((a, b) => {
+
+                    const dateA =
+                        convertirDate(
+                            a.dateCreation
+                        );
+
+                    const dateB =
+                        convertirDate(
+                            b.dateCreation
+                        );
+
+                    return dateB - dateA;
+
+                });
+
+
+                // ====================================
+                // AFFICHAGE
+                // ====================================
+
+                afficherFichiers(
+                    fichiers
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Erreur chargement fichiers :",
+                    error
+                );
+
+                afficherErreur();
+
+            }
+
+        }
+
+
+
+        // ========================================
+        // CONVERSION DATE
+        // ========================================
+
+        function convertirDate(date) {
+
+            if (!date) {
+
+                return 0;
+
+            }
+
+
+            // Timestamp Firebase
+
+            if (
+                typeof date === "object" &&
+                date.seconds
+            ) {
+
+                return date.seconds * 1000;
+
+            }
+
+
+            // Date JavaScript
+
+            if (date instanceof Date) {
+
+                return date.getTime();
+
+            }
+
+
+            // Texte DD/MM/YYYY
+
+            if (
+                typeof date === "string" &&
+                date.includes("/")
+            ) {
+
+                const morceaux =
+                    date.split("/");
+
+
+                if (morceaux.length === 3) {
+
+                    return new Date(
+                        morceaux[2],
+                        morceaux[1] - 1,
+                        morceaux[0]
+                    ).getTime();
+
+                }
+
+            }
+
+
+            // Autre format
+
+            const resultat =
+                new Date(date).getTime();
+
+
+            return isNaN(resultat)
+                ? 0
+                : resultat;
+
+        }
+
+
+
+        // ========================================
+        // AFFICHAGE DES FICHIERS
+        // ========================================
+
+        function afficherFichiers(fichiers) {
+
+
+            const reception =
+                document.getElementById(
+                    "listeReception"
+                );
+
+            const mouvement =
+                document.getElementById(
+                    "listeMouvement"
+                );
+
+            const expedition =
+                document.getElementById(
+                    "listeExpedition"
+                );
+
+
+            // Nettoyage
+
+            reception.innerHTML = "";
+
+            mouvement.innerHTML = "";
+
+            expedition.innerHTML = "";
+
+
+            // ====================================
+            // COMPTEUR
+            // ====================================
+
+            let compteurReception = 0;
+
+            let compteurMouvement = 0;
+
+            let compteurExpedition = 0;
+
+
+            // ====================================
+            // PARCOURS DES FICHIERS
+            // ====================================
+
+            fichiers.forEach(fichier => {
+
+
+                // ================================
+                // RÉCEPTION
+                // ================================
+
+                if (
+                    fichier.type === "reception"
+                ) {
+
+                    reception.appendChild(
+                        creerCarteFichier(
+                            fichier,
+                            "reception"
+                        )
+                    );
+
+                    compteurReception++;
+
+                }
+
+
+                // ================================
+                // MOUVEMENT
+                // ================================
+
+                else if (
+                    fichier.type === "adresse"
+                ) {
+
+                    mouvement.appendChild(
+                        creerCarteFichier(
+                            fichier,
+                            "mouvement"
+                        )
+                    );
+
+                    compteurMouvement++;
+
+                }
+
+
+                // ================================
+                // EXPÉDITION
+                // ================================
+
+                else if (
+                    fichier.type === "expedition"
+                ) {
+
+                    expedition.appendChild(
+                        creerCarteFichier(
+                            fichier,
+                            "expedition"
+                        )
+                    );
+
+                    compteurExpedition++;
+
+                }
+
+            });
+
+
+            // ====================================
+            // MESSAGES SI VIDE
+            // ====================================
+
+            if (
+                compteurReception === 0
+            ) {
+
+                reception.innerHTML =
+                    `<p class="message-vide">
+                        Aucun fichier
+                    </p>`;
+
+            }
+
+
+            if (
+                compteurMouvement === 0
+            ) {
+
+                mouvement.innerHTML =
+                    `<p class="message-vide">
+                        Aucun fichier
+                    </p>`;
+
+            }
+
+
+            if (
+                compteurExpedition === 0
+            ) {
+
+                expedition.innerHTML =
+                    `<p class="message-vide">
+                        Aucun fichier
+                    </p>`;
+
+            }
+
+        }
+
+
+
+        // ========================================
+        // CRÉATION CARTE
+        // ========================================
+
+        function creerCarteFichier(
+            fichier,
+            type
+        ) {
+
+
+            const carte =
+                document.createElement("div");
+
+
+            carte.className =
+                "fichier-synthese";
+
+
+            carte.classList.add(
+                "type-" + type
+            );
+
+
+            // Archive
+
+            if (
+                fichier.archive === true
+            ) {
+
+                carte.classList.add(
+                    "fichier-archive"
+                );
+
+            }
+
+
+            // ====================================
+            // DATE
+            // ====================================
+
+            const date =
+                document.createElement("div");
+
+
+            date.className =
+                "date-fichier";
+
+
+            date.textContent =
+                fichier.dateCreation || "-";
+
+
+            // ====================================
+            // NOM
+            // ====================================
+
+            const nom =
+                document.createElement("div");
+
+
+            nom.className =
+                "nom-fichier";
+
+
+            nom.textContent =
+                fichier.nom || "Sans nom";
+
+
+            // ====================================
+            // NOMBRE DE COLIS
+            // ====================================
+
+            const nombre =
+                document.createElement("div");
+
+
+            nombre.className =
+                "nombre-colis";
+
+
+            if (
+                type === "reception" ||
+                type === "expedition"
+            ) {
+
+                nombre.textContent =
+                    `${fichier.totalScans || 0} colis`;
+
+            }
+
+
+            // ====================================
+            // CONTENU CARTE
+            // ====================================
+
+            carte.appendChild(
+                date
+            );
+
+            carte.appendChild(
+                nom
+            );
+
+
+            if (
+                type === "reception" ||
+                type === "expedition"
+            ) {
+
+                carte.appendChild(
+                    nombre
+                );
+
+            }
+
+
+            // ====================================
+            // CLIC SUR LE FICHIER
+            // ====================================
+
+            carte.addEventListener(
+                "click",
+                () => {
+
+                    localStorage.setItem(
+                        "fichierActif",
+                        JSON.stringify(
+                            fichier
+                        )
+                    );
+
+
+                    window.location.href =
+                        "fichier-detail.html";
+
+                }
+            );
+
+
+            return carte;
+
+        }
+
+
+
+        // ========================================
+        // ERREUR
+        // ========================================
+
+        function afficherErreur() {
+
+            document.getElementById(
+                "listeReception"
+            ).innerHTML =
+                `<p class="message-erreur">
+                    Impossible de charger les fichiers.
+                </p>`;
+
+
+            document.getElementById(
+                "listeMouvement"
+            ).innerHTML =
+                `<p class="message-erreur">
+                    Impossible de charger les fichiers.
+                </p>`;
+
+
+            document.getElementById(
+                "listeExpedition"
+            ).innerHTML =
+                `<p class="message-erreur">
+                    Impossible de charger les fichiers.
+                </p>`;
+
+        }
+
+
+        // ========================================
+        // LANCEMENT
+        // ========================================
+
+        chargerFichiers();
+
+    </script>
+
+
+    <script
+        type="module"
+        src="maintenance.js"
+    ></script>
+
+
+</body>
+
+</html>

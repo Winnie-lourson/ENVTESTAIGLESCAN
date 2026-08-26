@@ -1,0 +1,743 @@
+/* ========================================
+   RESET
+======================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+html,
+body {
+
+    width: 100%;
+    min-height: 100vh;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc 0%,
+            #eef2f7 100%
+        );
+
+    color: #0f172a;
+}
+
+
+/* ========================================
+   BOUTON ACCUEIL
+======================================== */
+
+.btn-accueil {
+
+    position: fixed;
+
+    top: 15px;
+    left: 15px;
+
+    z-index: 999;
+}
+
+
+.btn-accueil button {
+
+    min-height: 52px;
+
+    padding: 0 18px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f2d62,
+            #1e40af
+        );
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+
+.btn-accueil button:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.15);
+}
+
+
+/* ========================================
+   ICÔNE ACCUEIL
+======================================== */
+
+.logo-action {
+
+    width: 18px;
+
+    height: 18px;
+
+    object-fit: contain;
+}
+
+
+/* ========================================
+   TITRES
+======================================== */
+
+h1 {
+
+    text-align: center;
+
+    font-size: 52px;
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    color: #0f2d62;
+
+    margin-top: 40px;
+
+    margin-bottom: 8px;
+}
+
+
+h2 {
+
+    text-align: center;
+
+    font-size: 21px;
+
+    color: #64748b;
+
+    font-weight: 600;
+
+    margin-bottom: 30px;
+}
+
+
+/* ========================================
+   ZONE PRINCIPALE
+======================================== */
+
+.zone-synthese {
+
+    width: 96%;
+
+    max-width: 1600px;
+
+    margin: 30px auto 40px;
+
+    padding: 25px;
+
+    background:
+        rgba(255,255,255,0.85);
+
+    backdrop-filter: blur(12px);
+
+    border-radius: 28px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.08);
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 20px;
+
+    align-items: start;
+}
+
+
+/* ========================================
+   COLONNES
+======================================== */
+
+.colonne-fichiers {
+
+    min-width: 0;
+
+    background:
+        rgba(248,250,252,0.85);
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    border:
+        1px solid #e2e8f0;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,0.05);
+
+}
+
+
+/* ========================================
+   TITRE DES COLONNES
+======================================== */
+
+.titre-colonne {
+
+    min-height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 10px 15px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f2d62,
+            #1e40af
+        );
+}
+
+
+.titre-colonne h3 {
+
+    margin: 0;
+
+    color: white;
+
+    font-size: 18px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    text-align: center;
+}
+
+
+/* ========================================
+   COULEUR SPÉCIFIQUE DES COLONNES
+======================================== */
+
+.colonne-reception .titre-colonne {
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f2d62,
+            #1e40af
+        );
+}
+
+
+.colonne-mouvement .titre-colonne {
+
+    background:
+        linear-gradient(
+            135deg,
+            #334155,
+            #475569
+        );
+}
+
+
+.colonne-expedition .titre-colonne {
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f2d62,
+            #2563eb
+        );
+}
+
+
+/* ========================================
+   LISTE DES FICHIERS
+======================================== */
+
+.liste-fichiers {
+
+    padding: 10px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    max-height: 70vh;
+
+    overflow-y: auto;
+}
+
+
+/* ========================================
+   CARTE FICHIER
+======================================== */
+
+.fichier-synthese {
+
+    min-height: 72px;
+
+    padding: 10px 13px;
+
+    border-radius: 11px;
+
+    background:
+        rgba(255,255,255,0.95);
+
+    border:
+        1px solid #e2e8f0;
+
+    display: grid;
+
+    align-items: center;
+
+    gap: 3px 12px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 2px 7px rgba(0,0,0,0.05);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+/* ========================================
+   RÉCEPTION / EXPÉDITION
+======================================== */
+
+.type-reception,
+.type-expedition {
+
+    grid-template-columns:
+        95px
+        minmax(0, 1fr)
+        75px;
+}
+
+
+/* ========================================
+   MOUVEMENT
+======================================== */
+
+.type-mouvement {
+
+    grid-template-columns:
+        95px
+        minmax(0, 1fr);
+}
+
+
+/* ========================================
+   DATE
+======================================== */
+
+.date-fichier {
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #64748b;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* ========================================
+   NOM DU FICHIER
+======================================== */
+
+.nom-fichier {
+
+    min-width: 0;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    color: #0f2d62;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* ========================================
+   NOMBRE DE COLIS
+======================================== */
+
+.nombre-colis {
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    color: #334155;
+
+    white-space: nowrap;
+
+    text-align: right;
+}
+
+
+/* ========================================
+   HOVER
+======================================== */
+
+.fichier-synthese:hover {
+
+    transform: translateY(-2px);
+
+    border-color: #93c5fd;
+
+    box-shadow:
+        0 7px 16px rgba(37,99,235,0.12);
+}
+
+
+/* ========================================
+   ARCHIVES
+======================================== */
+
+.fichier-synthese.fichier-archive {
+
+    background:
+        #f8fafc;
+
+    border-color:
+        #cbd5e1;
+
+    opacity: 0.82;
+}
+
+
+.fichier-synthese.fichier-archive:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 7px 16px rgba(15,23,42,0.08);
+}
+
+
+/* ========================================
+   MESSAGE VIDE
+======================================== */
+
+.message-vide {
+
+    padding: 25px 15px;
+
+    text-align: center;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* ========================================
+   MESSAGE ERREUR
+======================================== */
+
+.message-erreur {
+
+    padding: 25px 15px;
+
+    text-align: center;
+
+    color: #dc2626;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+/* ========================================
+   SCROLLBAR DES COLONNES
+======================================== */
+
+.liste-fichiers::-webkit-scrollbar {
+
+    width: 7px;
+}
+
+
+.liste-fichiers::-webkit-scrollbar-track {
+
+    background: transparent;
+}
+
+
+.liste-fichiers::-webkit-scrollbar-thumb {
+
+    background: #cbd5e1;
+
+    border-radius: 10px;
+}
+
+
+.liste-fichiers::-webkit-scrollbar-thumb:hover {
+
+    background: #94a3b8;
+}
+
+
+/* ========================================
+   TABLETTE
+======================================== */
+
+@media (max-width: 1100px) {
+
+    .zone-synthese {
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap: 12px;
+
+        padding: 15px;
+    }
+
+
+    .fichier-synthese {
+
+        padding: 9px 10px;
+
+        gap: 3px 8px;
+    }
+
+
+    .type-reception,
+    .type-expedition {
+
+        grid-template-columns:
+            82px
+            minmax(0, 1fr)
+            65px;
+    }
+
+
+    .type-mouvement {
+
+        grid-template-columns:
+            82px
+            minmax(0, 1fr);
+    }
+
+
+    .nom-fichier {
+
+        font-size: 13px;
+    }
+
+}
+
+
+/* ========================================
+   PETITE TABLETTE
+======================================== */
+
+@media (max-width: 800px) {
+
+    h1 {
+
+        font-size: 42px;
+
+        margin-top: 85px;
+    }
+
+
+    h2 {
+
+        font-size: 18px;
+    }
+
+
+    .zone-synthese {
+
+        width: 94%;
+
+        grid-template-columns:
+            1fr;
+
+        gap: 15px;
+
+        padding: 15px;
+    }
+
+
+    .liste-fichiers {
+
+        max-height: 350px;
+    }
+
+
+    .fichier-synthese {
+
+        min-height: 70px;
+    }
+
+}
+
+
+/* ========================================
+   PDA
+======================================== */
+
+@media (max-width: 400px) {
+
+    body {
+
+        padding: 10px;
+    }
+
+
+    .btn-accueil {
+
+        left: 10px;
+
+        top: 10px;
+    }
+
+
+    .btn-accueil button {
+
+        min-height: 46px;
+
+        padding: 0 12px;
+
+        font-size: 14px;
+
+        border-radius: 12px;
+    }
+
+
+    h1 {
+
+        font-size: 30px;
+
+        margin-top: 75px;
+    }
+
+
+    h2 {
+
+        font-size: 16px;
+
+        margin-bottom: 20px;
+    }
+
+
+    .zone-synthese {
+
+        width: 100%;
+
+        padding: 10px;
+
+        border-radius: 20px;
+    }
+
+
+    .titre-colonne {
+
+        min-height: 50px;
+    }
+
+
+    .titre-colonne h3 {
+
+        font-size: 16px;
+    }
+
+
+    .fichier-synthese {
+
+        min-height: 65px;
+
+        padding: 8px 10px;
+    }
+
+
+    .type-reception,
+    .type-expedition {
+
+        grid-template-columns:
+            75px
+            minmax(0, 1fr)
+            60px;
+    }
+
+
+    .type-mouvement {
+
+        grid-template-columns:
+            75px
+            minmax(0, 1fr);
+    }
+
+
+    .date-fichier {
+
+        font-size: 11px;
+    }
+
+
+    .nom-fichier {
+
+        font-size: 13px;
+    }
+
+
+    .nombre-colis {
+
+        font-size: 11px;
+    }
+
+}
