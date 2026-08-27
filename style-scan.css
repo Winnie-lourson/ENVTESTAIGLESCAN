@@ -473,6 +473,30 @@ button:disabled{
 }
 
 /* ========================================
+   PROTECTION NUMÉRO BT
+======================================== */
+
+#tableHistorique {
+
+    width: 100%;
+
+    table-layout: fixed;
+
+    overflow: hidden;
+}
+
+
+#tableHistorique th,
+#tableHistorique td {
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+/* ========================================
    SUPPRESSION
 ======================================== */
 

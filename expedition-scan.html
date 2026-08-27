@@ -432,6 +432,31 @@ function verifierBT() {
 
     let bt = champ.value.trim();
 
+    // ========================================
+    // LONGUEUR MAXIMUM DU BT
+    // ========================================
+
+    const longueurMaxBT = 30;
+
+    if (bt.length > longueurMaxBT) {
+
+        bouton.disabled = true;
+
+        message.innerText =
+            "❌ BT trop long (30 caractères maximum)";
+
+        message.style.color = "red";
+
+        affichage.innerHTML =
+            "<span class='partie-erreur'>" +
+            bt +
+            "</span>";
+
+        jouerSonErreur();
+
+        return;
+    }
+
     clearTimeout(timerBTValidation);
 
     validationBTLancee = false;
@@ -476,7 +501,7 @@ function verifierBT() {
 
                 champ.focus();
 
-            }, 1000);
+            }, 1500);
 
             // Replacer le curseur dans la zone de scan
             champ.focus();
@@ -562,7 +587,7 @@ async function ajouterBT() {
 
                 champ.focus();
 
-            }, 1000);
+            }, 1500);
 
             clearTimeout(timerBTValidation);
 
@@ -754,7 +779,7 @@ async function finDeScan() {
 
         alert("✅ Fichier enregistré avec succès");
 
-        window.location.href = "fichier.html";
+        window.location.href = "accueil.html";
 
     } catch (error) {
 
