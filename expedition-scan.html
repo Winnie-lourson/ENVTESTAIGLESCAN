@@ -469,18 +469,17 @@ function verifierBT() {
             // Désactiver le bouton
             document.getElementById("btnBT").disabled = true;
 
-            // Vider après 500 ms
+            // Vider après X ms
             setTimeout(() => {
 
                 champ.value = "";
 
                 champ.focus();
 
-            }, 750);
+            }, 1000);
 
-            clearTimeout(timerBTValidation);
-
-            validationBTLancee = false;
+            // Replacer le curseur dans la zone de scan
+            champ.focus();
 
             jouerSonErreur();
 
@@ -556,21 +555,20 @@ async function ajouterBT() {
             // Désactiver le bouton
             document.getElementById("btnBT").disabled = true;
 
-            // Arrêter la validation automatique
-            clearTimeout(timerBTValidation);
-            validationBTLancee = false;
-
-            // Jouer le son d'erreur
-            jouerSonErreur();
-
-            // Garder le BT visible pendant 750 ms
+            // Vider après X ms
             setTimeout(() => {
 
                 champ.value = "";
 
                 champ.focus();
 
-            }, 750);
+            }, 1000);
+
+            clearTimeout(timerBTValidation);
+
+            validationBTLancee = false;
+
+            jouerSonErreur();
 
             return;
         }

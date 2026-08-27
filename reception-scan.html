@@ -478,7 +478,7 @@ function verifierBT() {
 
                 champ.focus();
 
-            }, 750);
+            }, 1000);
 
             jouerSonErreur();
 
@@ -557,14 +557,14 @@ async function ajouterBT() {
             // Désactiver le bouton
             document.getElementById("btnBT").disabled = true;
 
-            // Vider après 500 ms
+            // Vider après X ms
             setTimeout(() => {
 
-                btInput.value = "";
+                champ.value = "";
 
-                btInput.focus();
+                champ.focus();
 
-            }, 750);
+            }, 1000);
 
             clearTimeout(timerBTValidation);
 
