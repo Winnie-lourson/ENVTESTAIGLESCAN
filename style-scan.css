@@ -668,8 +668,6 @@ button:disabled{
     .btn-accueil button,
     .btn-retour button{
 
-        position:static;
-
         min-height:46px;
 
         font-size:14px;
@@ -679,12 +677,16 @@ button:disabled{
 
     .btn-infos {
 
+        position: absolute;
+
         width: 46px;
 
         height: 46px;
     }
 
     .btn-infos img {
+
+        position: absolute;
 
         width: 24px;
 

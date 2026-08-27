@@ -474,6 +474,15 @@ function verifierBT() {
             // Désactiver le bouton Valider
             document.getElementById("btnBT").disabled = true;
 
+            // Vider la zone de saisie après un court délai
+            setTimeout(() => {
+
+                champ.value = "";
+
+                champ.focus();
+
+            }, 500);
+
             jouerSonErreur();
 
             // Replacer le curseur dans la zone de scan
@@ -507,7 +516,7 @@ function verifierBT() {
                 ajouterBT();
             }
 
-        }, 1000);
+        }, 750);
     }
 }
 
