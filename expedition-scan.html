@@ -472,9 +472,9 @@ function verifierBT() {
             // Vider après 500 ms
             setTimeout(() => {
 
-                btInput.value = "";
+                champ.value = "";
 
-                btInput.focus();
+                champ.focus();
 
             }, 750);
 
@@ -504,8 +504,6 @@ function verifierBT() {
     if (!validationBTLancee) {
 
         validationBTLancee = true;
-
-        jouerSonValidation();
 
         timerBTValidation = setTimeout(() => {
 
@@ -555,17 +553,17 @@ async function ajouterBT() {
                 bt +
                 "</span>";
 
-            // Vider la zone de saisie
-            btInput.value = "";
-
             // Désactiver le bouton
             document.getElementById("btnBT").disabled = true;
 
-            // Arrêter une éventuelle validation automatique
+            // Arrêter la validation automatique
             clearTimeout(timerBTValidation);
             validationBTLancee = false;
 
-            // Vider la zone de saisie après un court délai
+            // Jouer le son d'erreur
+            jouerSonErreur();
+
+            // Garder le BT visible pendant 750 ms
             setTimeout(() => {
 
                 champ.value = "";
@@ -573,11 +571,6 @@ async function ajouterBT() {
                 champ.focus();
 
             }, 750);
-
-            jouerSonErreur();
-
-            // Replacer le curseur
-            btInput.focus();
 
             return;
         }
@@ -658,6 +651,8 @@ async function ajouterBT() {
     ligne.appendChild(celluleAction);
 
     tableBody.insertBefore(ligne,tableBody.firstChild);
+
+    jouerSonValidation();
 
     await ajouterHistorique(
         "Scan BT",
