@@ -466,25 +466,23 @@ function verifierBT() {
                 bt +
                 "</span>";
 
-            // Vider automatiquement la zone de saisie
-            champ.value = "";
-
-            // Désactiver le bouton Valider
+            // Désactiver le bouton
             document.getElementById("btnBT").disabled = true;
 
-            // Vider la zone de saisie après un court délai
+            // Vider après 500 ms
             setTimeout(() => {
 
-                champ.value = "";
+                btInput.value = "";
 
-                champ.focus();
+                btInput.focus();
 
             }, 500);
 
-            jouerSonErreur();
+            clearTimeout(timerBTValidation);
 
-            // Replacer le curseur dans la zone de scan
-            champ.focus();
+            validationBTLancee = false;
+
+            jouerSonErreur();
 
             return;
         }

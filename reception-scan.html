@@ -468,9 +468,6 @@ function verifierBT() {
                 bt +
                 "</span>";
 
-            // Vider automatiquement la zone de saisie
-            champ.value = "";
-
             // Désactiver le bouton Valider
             document.getElementById("btnBT").disabled = true;
 
@@ -557,29 +554,23 @@ async function ajouterBT() {
                 bt +
                 "</span>";
 
-            // Vider la zone de saisie
-            btInput.value = "";
-
             // Désactiver le bouton
             document.getElementById("btnBT").disabled = true;
 
-            // Arrêter une éventuelle validation automatique
-            clearTimeout(timerBTValidation);
-            validationBTLancee = false;
-
-            // Vider la zone de saisie après un court délai
+            // Vider après 500 ms
             setTimeout(() => {
 
-                champ.value = "";
+                btInput.value = "";
 
-                champ.focus();
+                btInput.focus();
 
             }, 500);
 
-            jouerSonErreur();
+            clearTimeout(timerBTValidation);
 
-            // Replacer le curseur
-            btInput.focus();
+            validationBTLancee = false;
+
+            jouerSonErreur();
 
             return;
         }
