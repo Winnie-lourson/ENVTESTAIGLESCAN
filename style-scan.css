@@ -658,11 +658,15 @@ button:disabled{
     .btn-accueil {
 
         left: 10px;
+
+        position: absolute;
     }
 
     .btn-retour{
 
         left:120px;
+
+        position: absolute;
     }
 
     .btn-accueil button,
@@ -686,7 +690,6 @@ button:disabled{
 
     .btn-infos img {
 
-        position: absolute;
 
         width: 24px;
 

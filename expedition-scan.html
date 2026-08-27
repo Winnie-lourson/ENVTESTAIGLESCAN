@@ -567,6 +567,15 @@ async function ajouterBT() {
             clearTimeout(timerBTValidation);
             validationBTLancee = false;
 
+            // Vider la zone de saisie après un court délai
+            setTimeout(() => {
+
+                champ.value = "";
+
+                champ.focus();
+
+            }, 500);
+
             jouerSonErreur();
 
             // Replacer le curseur
