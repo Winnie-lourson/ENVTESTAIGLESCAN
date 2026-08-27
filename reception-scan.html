@@ -438,7 +438,6 @@ function verifierBT() {
 
     validationBTLancee = false;
 
-    message.innerText = "";
     affichage.innerHTML = "";
 
     // Vérifie uniquement que le champ n'est pas vide
@@ -470,7 +469,7 @@ function verifierBT() {
                 "</span>";
 
             // Vider automatiquement la zone de saisie
-            btInput.value = "";
+            champ.value = "";
 
             // Désactiver le bouton Valider
             document.getElementById("btnBT").disabled = true;
