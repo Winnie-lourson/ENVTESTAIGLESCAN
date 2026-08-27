@@ -411,6 +411,8 @@ button:disabled{
 #erreurSupport,
 #erreurBT{
 
+    color:#dc2626;
+
     text-align:center;
 
     min-height:22px;

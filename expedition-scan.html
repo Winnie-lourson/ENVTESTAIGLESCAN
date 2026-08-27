@@ -457,17 +457,26 @@ function verifierBT() {
 
         if (existingBT === bt) {
 
-            bouton.disabled = true;
+            document.getElementById("erreurBT").innerText =
+                "❌ BT déjà scanné";
 
-            affichage.innerHTML =
+            document.getElementById("erreurBT").style.color = "red";
+
+            document.getElementById("affichageBT").innerHTML =
                 "<span class='partie-erreur'>" +
                 bt +
                 "</span>";
 
-            message.innerText =
-                "❌ BT déjà scanné";
+            // Vider automatiquement la zone de saisie
+            btInput.value = "";
+
+            // Désactiver le bouton Valider
+            document.getElementById("btnBT").disabled = true;
 
             jouerSonErreur();
+
+            // Replacer le curseur dans la zone de scan
+            btInput.focus();
 
             return;
         }
@@ -620,7 +629,7 @@ async function ajouterBT() {
     ligne.appendChild(celluleDate);
     ligne.appendChild(celluleAction);
 
-    tableBody.appendChild(ligne);
+    tableBody.insertBefore(ligne,tableBody.firstChild);
 
     await ajouterHistorique(
         "Scan BT",
