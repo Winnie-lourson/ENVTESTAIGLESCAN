@@ -477,7 +477,7 @@ function verifierBT() {
             jouerSonErreur();
 
             // Replacer le curseur dans la zone de scan
-            btInput.focus();
+            champ.focus();
 
             return;
         }
@@ -541,14 +541,27 @@ async function ajouterBT() {
             document.getElementById("erreurBT").innerText =
                 "❌ BT déjà scanné";
 
-             document.getElementById("erreurBT").style.color = "red";
+            document.getElementById("erreurBT").style.color = "red";
 
             document.getElementById("affichageBT").innerHTML =
                 "<span class='partie-erreur'>" +
                 bt +
                 "</span>";
 
+            // Vider la zone de saisie
+            btInput.value = "";
+
+            // Désactiver le bouton
+            document.getElementById("btnBT").disabled = true;
+
+            // Arrêter une éventuelle validation automatique
+            clearTimeout(timerBTValidation);
+            validationBTLancee = false;
+
             jouerSonErreur();
+
+            // Replacer le curseur
+            btInput.focus();
 
             return;
         }
