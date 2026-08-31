@@ -433,8 +433,33 @@ h2 {
 
     overflow: clip;
 
+    position: relative;
+
     box-shadow:
         0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* ========================================
+   MASQUE SOUS L'EN-TÊTE
+======================================== */
+
+.historique-container::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 58px;
+
+    background: #0f2d62;
+
+    z-index: 5;
+
+    pointer-events: none;
 }
 
 #tableHistorique {
