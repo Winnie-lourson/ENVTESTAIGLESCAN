@@ -444,6 +444,8 @@ h2 {
     min-width: 1700px;
 
     border-collapse: collapse;
+
+    isolation: isolate;
 }
 
 /* ========================================
@@ -461,6 +463,8 @@ h2 {
     background: #0f2d62;
 
     box-shadow: 0 5px 10px rgba(15,45,98,0.22);
+
+    isolation: isolate;
 }
 
 #tableHistorique th {
@@ -481,6 +485,15 @@ h2 {
     letter-spacing: 1px;
 
     white-space: nowrap;
+
+    background-clip: padding-box;
+}
+
+#tableHistorique tbody {
+
+    position: relative;
+
+    z-index: 0;
 }
 
 #tableHistorique th:first-child,
