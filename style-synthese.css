@@ -442,7 +442,7 @@ h2 {
 
     white-space: normal;
 
-    overflow-wrap: anywhere;
+    overflow: anywhere;
 
     text-align: right;
 }
