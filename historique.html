@@ -84,6 +84,13 @@
         >
     </button>
 
+    <button
+        class="btn-supprimer-selection"
+        onclick="supprimerSelectionHistorique()"
+    >
+        <span>Supprimer la sélection</span>
+    </button>
+
 </div>
 
 <div class="historique-container">
@@ -93,6 +100,15 @@
         <thead>
 
             <tr>
+
+                <th>
+                    <input
+                        type="checkbox"
+                        id="selectionnerTout"
+                        onchange="selectionnerToutesLesLignes(this.checked)"
+                        title="Sélectionner toutes les lignes affichées"
+                    >
+                </th>
 
                 <th>Date</th>
 
@@ -134,7 +150,9 @@ import {
     getDocs,
     query,
     orderBy,
-    where
+    where,
+    doc,
+    writeBatch
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -225,7 +243,10 @@ async function chargerHistorique() {
 
             let data = doc.data();
 
-            historiqueData.push(data);
+            historiqueData.push({
+                id: doc.id,
+                ...data
+            });
 
         });
 
@@ -237,7 +258,7 @@ async function chargerHistorique() {
 
         body.innerHTML = `
             <tr>
-                <td colspan="5">
+                <td colspan="11">
                     ❌ Erreur chargement historique
                 </td>
             </tr>
@@ -253,12 +274,24 @@ function afficherHistorique(dataArray) {
 
     body.innerHTML = "";
 
+    document.getElementById("selectionnerTout").checked =
+        false;
+
     dataArray.forEach((data) => {
 
         let ligne =
             document.createElement("tr");
 
         ligne.innerHTML = `
+
+            <td>
+                <input
+                    type="checkbox"
+                    class="selection-historique"
+                    value="${data.id}"
+                    onchange="mettreAJourSelectionGlobale()"
+                >
+            </td>
 
             <td>${data.date || "-"}</td>
 
@@ -283,6 +316,96 @@ function afficherHistorique(dataArray) {
 
         body.appendChild(ligne);
     });
+}
+
+
+// ===============================
+// SÉLECTION ET SUPPRESSION
+// ===============================
+function selectionnerToutesLesLignes(selectionnee) {
+
+    document.querySelectorAll(
+        ".selection-historique"
+    ).forEach((caseSelection) => {
+
+        caseSelection.checked = selectionnee;
+    });
+}
+
+
+function mettreAJourSelectionGlobale() {
+
+    const casesSelection =
+        document.querySelectorAll(
+            ".selection-historique"
+        );
+
+    const toutesSelectionnees =
+        casesSelection.length > 0 &&
+        Array.from(casesSelection).every(
+            caseSelection => caseSelection.checked
+        );
+
+    document.getElementById("selectionnerTout").checked =
+        toutesSelectionnees;
+}
+
+
+async function supprimerSelectionHistorique() {
+
+    const identifiantsSelectionnes =
+        Array.from(
+            document.querySelectorAll(
+                ".selection-historique:checked"
+            )
+        ).map((caseSelection) => caseSelection.value);
+
+    if (identifiantsSelectionnes.length === 0) {
+
+        alert("Sélectionne au moins une ligne à supprimer.");
+
+        return;
+    }
+
+    const confirmation =
+        confirm(
+            `Supprimer définitivement ${identifiantsSelectionnes.length} ligne(s) sélectionnée(s) ?`
+        );
+
+    if (!confirmation) {
+        return;
+    }
+
+    try {
+
+        while (identifiantsSelectionnes.length > 0) {
+
+            const lot =
+                identifiantsSelectionnes.splice(0, 500);
+
+            const batch =
+                writeBatch(db);
+
+            lot.forEach((id) => {
+
+                batch.delete(
+                    doc(db, "historique", id)
+                );
+            });
+
+            await batch.commit();
+        }
+
+        alert("✅ Les lignes sélectionnées ont été supprimées.");
+
+        await chargerHistorique();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("❌ Erreur pendant la suppression.");
+    }
 }
 
 
@@ -447,6 +570,9 @@ init();
 window.filtrerHistorique = filtrerHistorique;
 window.resetFiltres = resetFiltres;
 window.exportHistoriqueExcel = exportHistoriqueExcel;
+window.selectionnerToutesLesLignes = selectionnerToutesLesLignes;
+window.mettreAJourSelectionGlobale = mettreAJourSelectionGlobale;
+window.supprimerSelectionHistorique = supprimerSelectionHistorique;
 
 </script>
 
