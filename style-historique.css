@@ -189,24 +189,6 @@ h2 {
    FILTRES
 ======================================== */
 
-.outils-historique-sticky {
-
-    position: sticky;
-
-    top: 0;
-
-    z-index: 1000;
-
-    padding-top: 12px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #f8fafc 0%,
-            #eef2f7 100%
-        );
-}
-
 .filtres-historique {
 
     width: 95%;
@@ -215,7 +197,7 @@ h2 {
 
     margin: auto;
 
-    margin-bottom: 25px;
+    margin-bottom: 12px;
 
     padding: 25px;
 
@@ -244,9 +226,15 @@ h2 {
 
     max-width: 1800px;
 
-    height: 20px;
+    position: sticky;
 
-    margin: -15px auto 12px;
+    top: 0;
+
+    z-index: 1001;
+
+    height: 22px;
+
+    margin: 0 auto 12px;
 
     overflow-x: scroll;
 
@@ -258,7 +246,9 @@ h2 {
 
     border-radius: 10px;
 
-    background: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.95);
+
+    box-shadow: 0 4px 10px rgba(15,23,42,0.12);
 }
 
 .barre-defilement-historique > div {
@@ -416,6 +406,12 @@ h2 {
 
 #tableHistorique th {
 
+    position: sticky;
+
+    top: 34px;
+
+    z-index: 1000;
+
     background: #0f2d62;
 
     border-right:
@@ -538,8 +534,8 @@ h2 {
     h1,
     h2,
     #infos,
-    .outils-historique-sticky,
     .filtres-historique,
+    .barre-defilement-historique,
     .historique-container {
 
         display: none !important;
