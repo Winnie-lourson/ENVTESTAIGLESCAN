@@ -98,7 +98,14 @@
     class="barre-defilement-historique"
     aria-label="Défilement horizontal du tableau"
 >
-    <div id="largeurBarreDefilementHistorique"></div>
+    <input
+        type="range"
+        id="curseurDefilementHistorique"
+        min="0"
+        max="0"
+        value="0"
+        aria-label="Défilement horizontal du tableau"
+    >
 </div>
 
 <div class="historique-container">
@@ -183,7 +190,8 @@ const conteneurHistorique =
 const barreDefilementHistorique =
     document.getElementById("barreDefilementHistorique");
 
-let synchronisationDefilementEnCours = false;
+const curseurDefilementHistorique =
+    document.getElementById("curseurDefilementHistorique");
 
 
 // ===============================
@@ -346,45 +354,42 @@ function afficherHistorique(dataArray) {
 // ===============================
 function actualiserBarreDefilementHistorique() {
 
-    document.getElementById(
-        "largeurBarreDefilementHistorique"
-    ).style.width =
-        `${tableauHistorique.scrollWidth}px`;
+    const decalageMaximum =
+        Math.max(
+            0,
+            tableauHistorique.scrollWidth -
+            conteneurHistorique.clientWidth
+        );
+
+    curseurDefilementHistorique.max =
+        decalageMaximum;
+
+    curseurDefilementHistorique.value =
+        Math.min(
+            Number(curseurDefilementHistorique.value),
+            decalageMaximum
+        );
+
+    deplacerTableauHorizontalement(
+        curseurDefilementHistorique.value
+    );
 }
 
 
-barreDefilementHistorique.addEventListener(
-    "scroll",
+function deplacerTableauHorizontalement(decalage) {
+
+    tableauHistorique.style.transform =
+        `translateX(-${decalage}px)`;
+}
+
+
+curseurDefilementHistorique.addEventListener(
+    "input",
     () => {
 
-        if (synchronisationDefilementEnCours) {
-            return;
-        }
-
-        synchronisationDefilementEnCours = true;
-
-        conteneurHistorique.scrollLeft =
-            barreDefilementHistorique.scrollLeft;
-
-        synchronisationDefilementEnCours = false;
-    }
-);
-
-
-conteneurHistorique.addEventListener(
-    "scroll",
-    () => {
-
-        if (synchronisationDefilementEnCours) {
-            return;
-        }
-
-        synchronisationDefilementEnCours = true;
-
-        barreDefilementHistorique.scrollLeft =
-            conteneurHistorique.scrollLeft;
-
-        synchronisationDefilementEnCours = false;
+        deplacerTableauHorizontalement(
+            curseurDefilementHistorique.value
+        );
     }
 );
 

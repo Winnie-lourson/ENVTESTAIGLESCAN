@@ -232,47 +232,28 @@ h2 {
 
     z-index: 1001;
 
-    height: 22px;
+    height: 34px;
 
     margin: 0 auto 12px;
-
-    overflow-x: scroll;
-
-    overflow-y: hidden;
-
-    scrollbar-color: #2563eb #dbeafe;
-
-    scrollbar-width: auto;
 
     border-radius: 10px;
 
     background: rgba(255,255,255,0.95);
 
     box-shadow: 0 4px 10px rgba(15,23,42,0.12);
+
+    display: flex;
+
+    align-items: center;
 }
 
-.barre-defilement-historique > div {
+.barre-defilement-historique input {
 
-    height: 1px;
-}
+    width: 100%;
 
-.barre-defilement-historique::-webkit-scrollbar {
+    accent-color: #2563eb;
 
-    height: 12px;
-}
-
-.barre-defilement-historique::-webkit-scrollbar-track {
-
-    background: #dbeafe;
-
-    border-radius: 10px;
-}
-
-.barre-defilement-historique::-webkit-scrollbar-thumb {
-
-    background: #2563eb;
-
-    border-radius: 10px;
+    cursor: ew-resize;
 }
 
 .filtres-historique input {
@@ -385,7 +366,7 @@ h2 {
 
     border-radius: 28px;
 
-    overflow: auto;
+    overflow: clip;
 
     box-shadow:
         0 10px 30px rgba(0,0,0,0.08);
@@ -408,7 +389,7 @@ h2 {
 
     position: sticky;
 
-    top: 34px;
+    top: 44px;
 
     z-index: 1000;
 
