@@ -469,6 +469,23 @@ button:disabled {
 }
 
 /* ========================================
+   EN-TÊTE DU TABLEAU TOUJOURS AU-DESSUS
+======================================== */
+
+#tableHistorique thead {
+    position: relative;
+    z-index: 20;
+}
+
+#tableHistorique thead th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+
+    background: #f1f5f9;
+}
+
+/* ========================================
    BOUTON SUPPRESSION
 ======================================== */
 
@@ -607,4 +624,16 @@ button:disabled {
 
         padding: 0 12px;
     }
+
+    /* Masquer Date de flash et N° de support sur PDA */
+
+    #tableHistorique th:nth-child(1),
+    #tableHistorique td:nth-child(1),
+
+    #tableHistorique th:nth-child(3),
+    #tableHistorique td:nth-child(3) {
+
+        display: none;
+    }
+
 }
