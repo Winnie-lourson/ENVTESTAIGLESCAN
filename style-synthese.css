@@ -171,7 +171,7 @@ h2 {
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap: 20px;
+    gap: 10px;
 
     align-items: stretch;
 
@@ -363,7 +363,8 @@ h2 {
 
     grid-template-columns:
         95px
-        minmax(0, 1fr);
+        minmax(0, 1fr)
+        75px;
 }
 
 
@@ -422,6 +423,28 @@ h2 {
     color: #334155;
 
     white-space: nowrap;
+
+    text-align: right;
+}
+
+
+/* ========================================
+   EMPLACEMENT SCANNÉ
+======================================== */
+
+.emplacement-scan {
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    color: #334155;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 
     text-align: right;
 }
@@ -596,7 +619,8 @@ h2 {
 
         grid-template-columns:
             82px
-            minmax(0, 1fr);
+            minmax(0, 1fr)
+            65px;
     }
 
 
@@ -747,7 +771,8 @@ h2 {
 
         grid-template-columns:
             75px
-            minmax(0, 1fr);
+            minmax(0, 1fr)
+            60px;
     }
 
 

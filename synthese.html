@@ -704,15 +704,17 @@
 
 
             // ====================================
-            // NOMBRE DE COLIS
+            // INFORMATIONS DE SCAN
             // ====================================
 
-            const nombre =
+            const informationScan =
                 document.createElement("div");
 
 
-            nombre.className =
-                "nombre-colis";
+            informationScan.className =
+                type === "mouvement"
+                    ? "emplacement-scan"
+                    : "nombre-colis";
 
 
             if (
@@ -720,8 +722,16 @@
                 type === "expedition"
             ) {
 
-                nombre.textContent =
+                informationScan.textContent =
                     `${fichier.totalScans || 0} colis`;
+
+            }
+
+
+            if (type === "mouvement") {
+
+                informationScan.textContent =
+                    fichier.contenu?.[0]?.adresse || "-";
 
             }
 
@@ -741,11 +751,12 @@
 
             if (
                 type === "reception" ||
+                type === "mouvement" ||
                 type === "expedition"
             ) {
 
                 carte.appendChild(
-                    nombre
+                    informationScan
                 );
 
             }
