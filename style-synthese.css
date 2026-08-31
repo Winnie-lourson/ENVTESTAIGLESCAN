@@ -364,7 +364,7 @@ h2 {
     grid-template-columns:
         95px
         minmax(0, 1fr)
-        75px;
+        minmax(75px, max-content);
 }
 
 
@@ -440,9 +440,7 @@ h2 {
 
     color: #334155;
 
-    white-space: normal;
-
-    overflow: anywhere;
+    white-space: nowrap;
 
     text-align: right;
 }
@@ -618,7 +616,7 @@ h2 {
         grid-template-columns:
             82px
             minmax(0, 1fr)
-            65px;
+            minmax(65px, max-content);
     }
 
 
@@ -770,7 +768,7 @@ h2 {
         grid-template-columns:
             75px
             minmax(0, 1fr)
-            60px;
+            minmax(60px, max-content);
     }
 
 
