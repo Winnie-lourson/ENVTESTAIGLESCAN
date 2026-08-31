@@ -189,6 +189,24 @@ h2 {
    FILTRES
 ======================================== */
 
+.outils-historique-sticky {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 1000;
+
+    padding-top: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc 0%,
+            #eef2f7 100%
+        );
+}
+
 .filtres-historique {
 
     width: 95%;
@@ -218,6 +236,53 @@ h2 {
     align-items: center;
 
     flex-wrap: wrap;
+}
+
+.barre-defilement-historique {
+
+    width: 95%;
+
+    max-width: 1800px;
+
+    height: 20px;
+
+    margin: -15px auto 12px;
+
+    overflow-x: scroll;
+
+    overflow-y: hidden;
+
+    scrollbar-color: #2563eb #dbeafe;
+
+    scrollbar-width: auto;
+
+    border-radius: 10px;
+
+    background: rgba(255,255,255,0.85);
+}
+
+.barre-defilement-historique > div {
+
+    height: 1px;
+}
+
+.barre-defilement-historique::-webkit-scrollbar {
+
+    height: 12px;
+}
+
+.barre-defilement-historique::-webkit-scrollbar-track {
+
+    background: #dbeafe;
+
+    border-radius: 10px;
+}
+
+.barre-defilement-historique::-webkit-scrollbar-thumb {
+
+    background: #2563eb;
+
+    border-radius: 10px;
 }
 
 .filtres-historique input {
@@ -473,6 +538,7 @@ h2 {
     h1,
     h2,
     #infos,
+    .outils-historique-sticky,
     .filtres-historique,
     .historique-container {
 

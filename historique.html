@@ -36,6 +36,8 @@
     <span id="totalHistorique">0</span>
 </p>
 
+<div class="outils-historique-sticky">
+
 <div class="filtres-historique">
 
     <input
@@ -90,6 +92,16 @@
     >
         <span>Supprimer la sélection</span>
     </button>
+
+</div>
+
+<div
+    id="barreDefilementHistorique"
+    class="barre-defilement-historique"
+    aria-label="Défilement horizontal du tableau"
+>
+    <div id="largeurBarreDefilementHistorique"></div>
+</div>
 
 </div>
 
@@ -165,6 +177,17 @@ if (!localStorage.getItem("utilisateur")) { window.location.href = "index.html";
 let body =
     document.getElementById("historiqueBody");
 let historiqueData = [];
+
+const tableauHistorique =
+    document.getElementById("tableHistorique");
+
+const conteneurHistorique =
+    document.querySelector(".historique-container");
+
+const barreDefilementHistorique =
+    document.getElementById("barreDefilementHistorique");
+
+let synchronisationDefilementEnCours = false;
 
 // ===============================
 // SÉCURITÉ ADMIN
@@ -316,7 +339,63 @@ function afficherHistorique(dataArray) {
 
         body.appendChild(ligne);
     });
+
+    actualiserBarreDefilementHistorique();
 }
+
+
+// ===============================
+// BARRE DE DÉFILEMENT EN HAUT
+// ===============================
+function actualiserBarreDefilementHistorique() {
+
+    document.getElementById(
+        "largeurBarreDefilementHistorique"
+    ).style.width =
+        `${tableauHistorique.scrollWidth}px`;
+}
+
+
+barreDefilementHistorique.addEventListener(
+    "scroll",
+    () => {
+
+        if (synchronisationDefilementEnCours) {
+            return;
+        }
+
+        synchronisationDefilementEnCours = true;
+
+        conteneurHistorique.scrollLeft =
+            barreDefilementHistorique.scrollLeft;
+
+        synchronisationDefilementEnCours = false;
+    }
+);
+
+
+conteneurHistorique.addEventListener(
+    "scroll",
+    () => {
+
+        if (synchronisationDefilementEnCours) {
+            return;
+        }
+
+        synchronisationDefilementEnCours = true;
+
+        barreDefilementHistorique.scrollLeft =
+            conteneurHistorique.scrollLeft;
+
+        synchronisationDefilementEnCours = false;
+    }
+);
+
+
+window.addEventListener(
+    "resize",
+    actualiserBarreDefilementHistorique
+);
 
 
 // ===============================
