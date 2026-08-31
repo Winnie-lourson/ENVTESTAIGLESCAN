@@ -228,13 +228,13 @@ h2 {
 
     position: sticky;
 
-    top: 30px;
+    top: 75px;
 
     z-index: 1001;
 
     height: 28px;
 
-    margin: 0 auto 2px;
+    margin: 0 auto 12px;
 
     border-radius: 10px;
 
@@ -450,13 +450,20 @@ h2 {
    HEADER
 ======================================== */
 
-#tableHistorique th {
+#tableHistorique thead {
 
     position: sticky;
 
-    top: 60px;
+    top: 110px;
 
     z-index: 1000;
+
+    background: #0f2d62;
+
+    box-shadow: 0 5px 10px rgba(15,45,98,0.22);
+}
+
+#tableHistorique th {
 
     background: #0f2d62;
 
