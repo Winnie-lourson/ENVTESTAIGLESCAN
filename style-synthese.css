@@ -440,11 +440,9 @@ h2 {
 
     color: #334155;
 
-    white-space: nowrap;
+    white-space: normal;
 
-    overflow: hidden;
-
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
 
     text-align: right;
 }
