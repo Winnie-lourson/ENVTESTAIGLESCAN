@@ -1,0 +1,225 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    padding: 38px 24px;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #0f172a;
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+}
+
+.btn-accueil {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 10;
+}
+
+.btn-accueil button,
+.outils-stock button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 14px;
+    color: white;
+    background: linear-gradient(135deg, #0f2d62, #2563eb);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-accueil button:hover,
+.outils-stock button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(37,99,235,0.25);
+}
+
+.logo-action {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+main {
+    width: min(1400px, 100%);
+    margin: 0 auto;
+}
+
+h1 {
+    margin-top: 20px;
+    color: #0f2d62;
+    text-align: center;
+    font-size: clamp(38px, 6vw, 62px);
+    letter-spacing: 2px;
+}
+
+.sous-titre {
+    margin: 8px 0 30px;
+    color: #64748b;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.indicateurs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.indicateur,
+.zone-stock {
+    border: 1px solid rgba(226,232,240,0.9);
+    border-radius: 22px;
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 10px 30px rgba(15,23,42,0.08);
+}
+
+.indicateur {
+    min-height: 130px;
+    padding: 24px;
+    text-align: center;
+}
+
+.indicateur span {
+    display: block;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.indicateur strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 42px;
+}
+
+.indicateur.reception strong { color: #15803d; }
+.indicateur.expedition strong { color: #b91c1c; }
+.indicateur.stock strong { color: #1d4ed8; }
+
+.zone-stock {
+    padding: 22px;
+}
+
+.outils-stock {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.outils-stock input,
+.outils-stock select {
+    min-height: 48px;
+    padding: 0 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    color: #0f172a;
+    background: white;
+    font: inherit;
+}
+
+.outils-stock input {
+    flex: 1 1 320px;
+}
+
+.outils-stock select {
+    min-width: 165px;
+}
+
+.outils-stock input:focus,
+.outils-stock select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.14);
+}
+
+.infos-stock {
+    margin: 20px 0 12px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.tableau-conteneur {
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+}
+
+table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 15px;
+    color: white;
+    background: #0f2d62;
+    font-size: 13px;
+    letter-spacing: 0.6px;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 14px 15px;
+    border-bottom: 1px solid #e2e8f0;
+    background: rgba(255,255,255,0.8);
+    font-size: 14px;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: #eff6ff; }
+td:nth-child(3),
+td:nth-child(4),
+td:nth-child(5),
+td:nth-child(6) { text-align: center; }
+
+.valeur-stock {
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.en-stock { color: #15803d; }
+.epuise { color: #64748b; }
+.anomalie { color: #b91c1c; }
+
+.badge-statut {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.badge-statut.en-stock { background: #dcfce7; }
+.badge-statut.epuise { background: #e2e8f0; }
+.badge-statut.anomalie { background: #fee2e2; }
+
+@media (max-width: 700px) {
+    body { padding: 78px 12px 20px; }
+
+    .btn-accueil { top: 12px; left: 12px; }
+    .btn-accueil button { min-height: 44px; }
+
+    .indicateurs { grid-template-columns: 1fr; gap: 12px; }
+    .indicateur { min-height: 100px; padding: 18px; }
+    .indicateur strong { font-size: 34px; }
+
+    .zone-stock { padding: 14px; }
+    .outils-stock > * { width: 100%; }
+    .outils-stock select { min-width: 0; }
+}

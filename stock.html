@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+    <title>Stock</title>
+    <link rel="stylesheet" href="style-stock.css">
+    <link rel="icon" type="image/png" href="images/ASLOGOV1.png">
+</head>
+
+<body>
+
+<div class="btn-accueil">
+    <button onclick="window.location.href='accueil.html'">
+        <img src="images/accueil2-blanc.png" class="logo-action" alt="">
+        <span>Accueil</span>
+    </button>
+</div>
+
+<main>
+    <h1>STOCK</h1>
+    <p class="sous-titre">
+        Réceptions − expéditions, calculé à partir des scans enregistrés
+    </p>
+
+    <section class="indicateurs" aria-label="Résumé du stock">
+        <article class="indicateur reception">
+            <span>Réceptions</span>
+            <strong id="totalReception">0</strong>
+        </article>
+
+        <article class="indicateur expedition">
+            <span>Expéditions</span>
+            <strong id="totalExpedition">0</strong>
+        </article>
+
+        <article class="indicateur stock">
+            <span>Stock actuel</span>
+            <strong id="totalStock">0</strong>
+        </article>
+    </section>
+
+    <section class="zone-stock">
+        <div class="outils-stock">
+            <input
+                type="search"
+                id="rechercheStock"
+                placeholder="Rechercher un support ou un numéro BT"
+            >
+
+            <select id="filtreStatut" aria-label="Filtrer le statut du stock">
+                <option value="tous">Tous les articles</option>
+                <option value="en-stock">En stock</option>
+                <option value="epuise">Stock nul</option>
+                <option value="anomalie">Stock négatif</option>
+            </select>
+
+            <button id="btnActualiser" type="button">
+                Actualiser
+            </button>
+        </div>
+
+        <p id="infosStock" class="infos-stock">Chargement du stock…</p>
+
+        <div class="tableau-conteneur">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Support(s)</th>
+                        <th>Numéro BT</th>
+                        <th>Réceptions</th>
+                        <th>Expéditions</th>
+                        <th>Stock</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody id="corpsStock"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script type="module">
+
+import { db } from "./firebase-config.js";
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+if (!localStorage.getItem("utilisateur")) {
+    window.location.href = "index.html";
+}
+
+const corpsStock = document.getElementById("corpsStock");
+const rechercheStock = document.getElementById("rechercheStock");
+const filtreStatut = document.getElementById("filtreStatut");
+let lignesStock = [];
+
+
+async function chargerStock() {
+
+    document.getElementById("infosStock").textContent =
+        "Chargement du stock…";
+
+    try {
+
+        const snapshot = await getDocs(
+            collection(db, "fichiersScans")
+        );
+
+        const stockParBT = new Map();
+        let totalReception = 0;
+        let totalExpedition = 0;
+
+        snapshot.forEach((documentFirebase) => {
+
+            const fichier = documentFirebase.data();
+
+            if (
+                fichier.type !== "reception" &&
+                fichier.type !== "expedition"
+            ) {
+                return;
+            }
+
+            (fichier.contenu || []).forEach((scan) => {
+
+                const bt = (scan.bt || "").trim();
+
+                if (!bt) {
+                    return;
+                }
+
+                if (!stockParBT.has(bt)) {
+
+                    stockParBT.set(bt, {
+                        bt: bt,
+                        receptions: 0,
+                        expeditions: 0,
+                        supports: new Set()
+                    });
+                }
+
+                const ligne = stockParBT.get(bt);
+                const support = (scan.support || "").trim();
+
+                if (support) {
+                    ligne.supports.add(support);
+                }
+
+                if (fichier.type === "reception") {
+                    ligne.receptions += 1;
+                    totalReception += 1;
+                } else {
+                    ligne.expeditions += 1;
+                    totalExpedition += 1;
+                }
+            });
+        });
+
+        lignesStock = Array.from(stockParBT.values())
+            .map((ligne) => ({
+                ...ligne,
+                stock: ligne.receptions - ligne.expeditions,
+                supports: Array.from(ligne.supports).sort().join(", ") || "-"
+            }))
+            .sort((a, b) => a.bt.localeCompare(
+                b.bt,
+                "fr",
+                { numeric: true, sensitivity: "base" }
+            ));
+
+        document.getElementById("totalReception").textContent =
+            totalReception;
+
+        document.getElementById("totalExpedition").textContent =
+            totalExpedition;
+
+        document.getElementById("totalStock").textContent =
+            totalReception - totalExpedition;
+
+        afficherStock();
+
+    } catch (error) {
+
+        console.error("Erreur chargement du stock :", error);
+
+        corpsStock.innerHTML = "";
+
+        const ligneErreur = document.createElement("tr");
+        const celluleErreur = document.createElement("td");
+
+        celluleErreur.colSpan = 6;
+        celluleErreur.textContent = "❌ Impossible de charger le stock.";
+        ligneErreur.appendChild(celluleErreur);
+        corpsStock.appendChild(ligneErreur);
+
+        document.getElementById("infosStock").textContent = "";
+    }
+}
+
+
+function statutDeStock(stock) {
+
+    if (stock > 0) {
+        return { texte: "En stock", classe: "en-stock" };
+    }
+
+    if (stock === 0) {
+        return { texte: "Épuisé", classe: "epuise" };
+    }
+
+    return { texte: "Anomalie", classe: "anomalie" };
+}
+
+
+function afficherStock() {
+
+    const recherche = rechercheStock.value.trim().toLowerCase();
+    const statutFiltre = filtreStatut.value;
+
+    const lignesFiltrees = lignesStock.filter((ligne) => {
+
+        const statut = statutDeStock(ligne.stock);
+        const correspondRecherche =
+            !recherche ||
+            ligne.bt.toLowerCase().includes(recherche) ||
+            ligne.supports.toLowerCase().includes(recherche);
+
+        const correspondStatut =
+            statutFiltre === "tous" ||
+            statut.classe === statutFiltre;
+
+        return correspondRecherche && correspondStatut;
+    });
+
+    corpsStock.innerHTML = "";
+
+    if (lignesFiltrees.length === 0) {
+
+        const ligneVide = document.createElement("tr");
+        const celluleVide = document.createElement("td");
+
+        celluleVide.colSpan = 6;
+        celluleVide.textContent = "Aucun article ne correspond à la recherche.";
+        ligneVide.appendChild(celluleVide);
+        corpsStock.appendChild(ligneVide);
+
+    } else {
+
+        lignesFiltrees.forEach((ligne) => {
+
+            const statut = statutDeStock(ligne.stock);
+            const ligneTableau = document.createElement("tr");
+
+            [
+                ligne.supports,
+                ligne.bt,
+                ligne.receptions,
+                ligne.expeditions,
+                ligne.stock
+            ].forEach((valeur, index) => {
+
+                const cellule = document.createElement("td");
+
+                cellule.textContent = valeur;
+
+                if (index === 4) {
+                    cellule.className = "valeur-stock " + statut.classe;
+                }
+
+                ligneTableau.appendChild(cellule);
+            });
+
+            const celluleStatut = document.createElement("td");
+            const badge = document.createElement("span");
+
+            badge.className = "badge-statut " + statut.classe;
+            badge.textContent = statut.texte;
+            celluleStatut.appendChild(badge);
+            ligneTableau.appendChild(celluleStatut);
+
+            corpsStock.appendChild(ligneTableau);
+        });
+    }
+
+    document.getElementById("infosStock").textContent =
+        `${lignesFiltrees.length} article(s) affiché(s) sur ${lignesStock.length}`;
+}
+
+
+rechercheStock.addEventListener("input", afficherStock);
+filtreStatut.addEventListener("change", afficherStock);
+document.getElementById("btnActualiser").addEventListener("click", chargerStock);
+
+chargerStock();
+
+</script>
+
+<script type="module" src="maintenance.js"></script>
+
+</body>
+</html>
