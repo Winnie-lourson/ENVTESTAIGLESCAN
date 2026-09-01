@@ -140,7 +140,7 @@ async function chargerStock() {
 
                     stockParBT.set(bt, {
                         bt: bt,
-                        refInterne: (scan.refInterne || "").trim(),
+                        refInterne: (scan.refInterne || "").trim().substring(0, 3),
                         receptions: 0,
                         expeditions: 0,
                         supports: new Set()
