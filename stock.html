@@ -71,6 +71,7 @@
                     <tr>
                         <th>Support(s)</th>
                         <th>Numéro BT</th>
+                        <th>N° réf interne</th>
                         <th>Réceptions</th>
                         <th>Expéditions</th>
                         <th>Stock</th>
@@ -139,6 +140,7 @@ async function chargerStock() {
 
                     stockParBT.set(bt, {
                         bt: bt,
+                        refInterne: (scan.refInterne || "").trim(),
                         receptions: 0,
                         expeditions: 0,
                         supports: new Set()
@@ -194,7 +196,7 @@ async function chargerStock() {
         const ligneErreur = document.createElement("tr");
         const celluleErreur = document.createElement("td");
 
-        celluleErreur.colSpan = 6;
+        celluleErreur.colSpan = 7;
         celluleErreur.textContent = "❌ Impossible de charger le stock.";
         ligneErreur.appendChild(celluleErreur);
         corpsStock.appendChild(ligneErreur);
@@ -245,7 +247,7 @@ function afficherStock() {
         const ligneVide = document.createElement("tr");
         const celluleVide = document.createElement("td");
 
-        celluleVide.colSpan = 6;
+        celluleVide.colSpan = 7;
         celluleVide.textContent = "Aucun article ne correspond à la recherche.";
         ligneVide.appendChild(celluleVide);
         corpsStock.appendChild(ligneVide);
@@ -260,6 +262,7 @@ function afficherStock() {
             [
                 ligne.supports,
                 ligne.bt,
+                ligne.refInterne,
                 ligne.receptions,
                 ligne.expeditions,
                 ligne.stock
