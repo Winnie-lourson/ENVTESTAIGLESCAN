@@ -72,6 +72,9 @@
                         <th>Support(s)</th>
                         <th>Numéro BT</th>
                         <th>N° réf interne</th>
+                        <th>Date réception</th>
+                        <th>Date expédition</th>
+                        <th>Emplacement</th>
                         <th>Réceptions</th>
                         <th>Expéditions</th>
                         <th>Stock</th>
@@ -136,19 +139,38 @@ async function chargerStock() {
                     return;
                 }
 
-                if (!stockParBT.has(bt)) {
-
-                    stockParBT.set(bt, {
-                        bt: bt,
-                        refInterne: (fichier.nom || "").trim().substring(0, 3),
-                        receptions: 0,
-                        expeditions: 0,
-                        supports: new Set()
-                    });
-                }
+                stockParBT.set(bt, {
+                    bt: bt,
+                    refInterne: (fichier.nom || "").trim().substring(0, 3),
+                    dateReception: "",
+                    dateExpedition: "",
+                    emplacement: "",
+                    receptions: 0,
+                    expeditions: 0,
+                    supports: new Set()
+                });
 
                 const ligne = stockParBT.get(bt);
                 const support = (scan.support || "").trim();
+
+                // Emplacement
+                if (scan.adresse) {
+                    ligne.emplacement = scan.adresse.trim();
+                }
+
+                // Date de scan
+                if (fichier.type === "reception") {
+
+                    if (!ligne.dateReception && fichier.dateCreation) {
+                        ligne.dateReception = fichier.dateCreation;
+                    }
+
+                } else if (fichier.type === "expedition") {
+
+                    if (!ligne.dateExpedition && fichier.dateCreation) {
+                        ligne.dateExpedition = fichier.dateCreation;
+                    }
+                }
 
                 if (support) {
                     ligne.supports.add(support);
@@ -167,7 +189,13 @@ async function chargerStock() {
         lignesStock = Array.from(stockParBT.values())
             .map((ligne) => ({
                 ...ligne,
-                stock: ligne.receptions - ligne.expeditions,
+
+                // Stock réel utilisé pour déterminer le statut
+                stockReel: ligne.receptions - ligne.expeditions,
+
+                // Stock affiché : jamais inférieur à 0
+                stock: Math.max(0, ligne.receptions - ligne.expeditions),
+
                 supports: Array.from(ligne.supports).sort().join(", ") || "-"
             }))
             .sort((a, b) => a.bt.localeCompare(
@@ -196,7 +224,7 @@ async function chargerStock() {
         const ligneErreur = document.createElement("tr");
         const celluleErreur = document.createElement("td");
 
-        celluleErreur.colSpan = 7;
+        celluleErreur.colSpan = 10;
         celluleErreur.textContent = "❌ Impossible de charger le stock.";
         ligneErreur.appendChild(celluleErreur);
         corpsStock.appendChild(ligneErreur);
@@ -227,7 +255,7 @@ function afficherStock() {
 
     const lignesFiltrees = lignesStock.filter((ligne) => {
 
-        const statut = statutDeStock(ligne.stock);
+        const statut = statutDeStock(ligne.stockReel);
         const correspondRecherche =
             !recherche ||
             ligne.bt.toLowerCase().includes(recherche) ||
@@ -247,7 +275,7 @@ function afficherStock() {
         const ligneVide = document.createElement("tr");
         const celluleVide = document.createElement("td");
 
-        celluleVide.colSpan = 7;
+        celluleVide.colSpan = 10;
         celluleVide.textContent = "Aucun article ne correspond à la recherche.";
         ligneVide.appendChild(celluleVide);
         corpsStock.appendChild(ligneVide);
@@ -263,6 +291,9 @@ function afficherStock() {
                 ligne.supports,
                 ligne.bt,
                 ligne.refInterne,
+                ligne.dateReception || "-",
+                ligne.dateExpedition || "-",
+                ligne.emplacement || "-",
                 ligne.receptions,
                 ligne.expeditions,
                 ligne.stock
