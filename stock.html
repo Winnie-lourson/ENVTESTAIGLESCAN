@@ -139,16 +139,18 @@ async function chargerStock() {
                     return;
                 }
 
-                stockParBT.set(bt, {
-                    bt: bt,
-                    refInterne: (fichier.nom || "").trim().substring(0, 3),
-                    dateReception: "",
-                    dateExpedition: "",
-                    emplacement: "",
-                    receptions: 0,
-                    expeditions: 0,
-                    supports: new Set()
-                });
+                if (!stockParBT.has(bt)) {
+                    stockParBT.set(bt, {
+                        bt: bt,
+                        refInterne: (fichier.nom || "").trim().substring(0, 3),
+                        dateReception: "",
+                        dateExpedition: "",
+                        emplacement: "",
+                        receptions: 0,
+                        expeditions: 0,
+                        supports: new Set()
+                    });
+                }
 
                 const ligne = stockParBT.get(bt);
                 const support = (scan.support || "").trim();
@@ -284,7 +286,7 @@ function afficherStock() {
 
         lignesFiltrees.forEach((ligne) => {
 
-            const statut = statutDeStock(ligne.stock);
+            const statut = statutDeStock(ligne.stockReel);
             const ligneTableau = document.createElement("tr");
 
             [
