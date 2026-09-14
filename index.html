@@ -69,7 +69,7 @@
 
 <script type="module">
 
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 import { ajouterHistorique } from "./historique.js";
 import {
     doc,
@@ -80,6 +80,9 @@ import {
     where,
     getDocs,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+    signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // ===============================
 // INTERFACE UTILISATEUR
@@ -130,6 +133,24 @@ async function connexion() {
             "❌ Veuillez remplir tous les champs";
 
         return;
+    }
+    
+    try {
+
+        const emailFirebase = login.toLowerCase() + "@aiglescan.local";
+
+        const userCredential = await signInWithEmailAndPassword(
+            auth,
+            emailFirebase,
+            password
+        );
+
+        console.log("✅ Connexion Firebase réussie :", userCredential.user.uid);
+
+    } catch (error) {
+
+        console.error("❌ Erreur Firebase Auth :", error);
+
     }
 
     try {
