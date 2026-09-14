@@ -120,7 +120,8 @@ import { db, auth } from "./firebase-config.js";
 import {
     collection,
     getDocs,
-    addDoc,
+    getDoc,
+    setDoc,
     deleteDoc,
     updateDoc,
     doc,
@@ -385,9 +386,8 @@ async function ajouterUtilisateur() {
         // ===============================
         // CRÉATION DU DOCUMENT FIRESTORE
         // ===============================
-
-        await addDoc(
-            collection(db, "utilisateurs"),
+        await setDoc(
+            doc(db, "utilisateurs", uid),
             {
                 nom: nom,
                 login: login,
