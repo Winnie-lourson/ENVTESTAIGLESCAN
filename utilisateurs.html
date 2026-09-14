@@ -371,11 +371,15 @@ async function ajouterUtilisateur() {
         const emailFirebase =
             login + "@aiglescan.local";
 
-        await createUserWithEmailAndPassword(
-            authCreationUtilisateur,
-            emailFirebase,
-            password
-        );
+        const userCredential =
+            await createUserWithEmailAndPassword(
+                authCreationUtilisateur,
+                emailFirebase,
+                password
+            );
+
+        const uid =
+            userCredential.user.uid;
 
 
         // ===============================
@@ -387,7 +391,8 @@ async function ajouterUtilisateur() {
             {
                 nom: nom,
                 login: login,
-                role: role
+                role: role,
+                uid: uid
             }
         );
 
