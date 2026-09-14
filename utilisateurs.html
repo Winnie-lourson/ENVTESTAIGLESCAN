@@ -117,6 +117,8 @@
 
 import { db } from "./firebase-config.js";
 
+import { db, auth } from "./firebase-config.js";
+
 import {
     collection,
     getDocs,
@@ -129,7 +131,32 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+import {
+    initializeApp,
+    getApp
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getAuth,
+    createUserWithEmailAndPassword
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
 if (!localStorage.getItem("utilisateur")) { window.location.href = "index.html"; }
+
+// ===============================
+// FIREBASE AUTH SECONDAIRE
+// ===============================
+const appPrincipal = getApp();
+
+const appCreationUtilisateur = initializeApp(
+    appPrincipal.options,
+    "creationUtilisateur"
+);
+
+const authCreationUtilisateur =
+    getAuth(appCreationUtilisateur);
 
 
 // ===============================
@@ -288,17 +315,22 @@ async function chargerUtilisateurs() {
 // ===============================
 async function ajouterUtilisateur() {
 
-    let nom =
+    const nom =
         document.getElementById("nom").value.trim();
 
-    let login =
-        document.getElementById("login").value.trim();
+    const login =
+        document.getElementById("login").value.trim().toLowerCase();
 
-    let password =
+    const password =
         document.getElementById("password").value.trim();
 
-    let role =
+    const role =
         document.getElementById("role").value;
+
+
+    // ===============================
+    // VÉRIFICATION DES CHAMPS
+    // ===============================
 
     if (
         nom === "" ||
@@ -311,17 +343,60 @@ async function ajouterUtilisateur() {
         return;
     }
 
+
     try {
+
+        // ===============================
+        // VÉRIFICATION LOGIN EXISTANT
+        // ===============================
+
+        const q = query(
+            collection(db, "utilisateurs"),
+            where("login", "==", login)
+        );
+
+        const utilisateursExistants =
+            await getDocs(q);
+
+        if (!utilisateursExistants.empty) {
+
+            alert("❌ Ce login existe déjà");
+
+            return;
+        }
+
+
+        // ===============================
+        // COMPTE FIREBASE AUTH
+        // ===============================
+
+        const emailFirebase =
+            login + "@aiglescan.local";
+
+        await createUserWithEmailAndPassword(
+            authCreationUtilisateur,
+            emailFirebase,
+            password
+        );
+
+
+        // ===============================
+        // CRÉATION DU DOCUMENT FIRESTORE
+        // ===============================
 
         await addDoc(
             collection(db, "utilisateurs"),
             {
                 nom: nom,
                 login: login,
-                password: password,
                 role: role
             }
         );
+
+
+        // ===============================
+        // NETTOYAGE FORMULAIRE
+        // ===============================
 
         alert("✅ Utilisateur ajouté");
 
@@ -333,13 +408,50 @@ async function ajouterUtilisateur() {
 
         document.getElementById("role").value = "user";
 
+
+        // ===============================
+        // RECHARGEMENT
+        // ===============================
+
         chargerUtilisateurs();
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Erreur création utilisateur :",
+            error
+        );
 
-        alert("❌ Erreur ajout utilisateur");
+
+        // ===============================
+        // MESSAGES D'ERREUR
+        // ===============================
+
+        if (error.code === "auth/email-already-in-use") {
+
+            alert(
+                "❌ Ce login possède déjà un compte Firebase"
+            );
+
+        } else if (error.code === "auth/weak-password") {
+
+            alert(
+                "❌ Le mot de passe est trop faible"
+            );
+
+        } else if (error.code === "auth/invalid-email") {
+
+            alert(
+                "❌ Login invalide"
+            );
+
+        } else {
+
+            alert(
+                "❌ Erreur lors de la création de l'utilisateur"
+            );
+        }
     }
 }
 
