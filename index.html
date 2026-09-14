@@ -116,13 +116,13 @@ document.getElementById("password")
 // ===============================
 async function connexion() {
 
-    let login =
-        document.getElementById("login").value.trim();
+    const login =
+        document.getElementById("login").value.trim().toLowerCase();
 
-    let password =
+    const password =
         document.getElementById("password").value.trim();
 
-    let erreur =
+    const erreur =
         document.getElementById("erreurConnexion");
 
     erreur.innerText = "";
@@ -134,31 +134,30 @@ async function connexion() {
 
         return;
     }
-    
+
     try {
 
-        const emailFirebase = login.toLowerCase() + "@aiglescan.local";
+        // ===============================
+        // CONNEXION FIREBASE AUTH
+        // ===============================
 
-        const userCredential = await signInWithEmailAndPassword(
+        const emailFirebase =
+            login + "@aiglescan.local";
+
+        await signInWithEmailAndPassword(
             auth,
             emailFirebase,
             password
         );
 
-        console.log("✅ Connexion Firebase réussie :", userCredential.user.uid);
 
-    } catch (error) {
-
-        console.error("❌ Erreur Firebase Auth :", error);
-
-    }
-
-    try {
+        // ===============================
+        // VÉRIFICATION UTILISATEUR
+        // ===============================
 
         const q = query(
             collection(db, "utilisateurs"),
-            where("login", "==", login),
-            where("password", "==", password)
+            where("login", "==", login)
         );
 
         const querySnapshot =
@@ -167,23 +166,23 @@ async function connexion() {
         if (querySnapshot.empty) {
 
             erreur.innerText =
-                "❌ Identifiants incorrects";
+                "❌ Utilisateur non reconnu";
 
-                await ajouterHistorique(
-                    "Échec connexion",
-                    "",
-                    {
-                        login: login
-                    }
-                );
             return;
         }
 
+        // ===============================
         // SAUVEGARDE SESSION
+        // ===============================
+
         localStorage.setItem(
             "utilisateur",
             login
         );
+
+        // ===============================
+        // HISTORIQUE
+        // ===============================
 
         await ajouterHistorique(
             "Connexion utilisateur",
@@ -193,26 +192,38 @@ async function connexion() {
             }
         );
 
-        // Vérifie maintenance
+        // ===============================
+        // VÉRIFICATION MAINTENANCE
+        // ===============================
+
         if (window.systemeHorsService) {
 
-            alert("❌ Système actuellement hors service");
+            alert(
+                "❌ Système actuellement hors service"
+            );
 
             return;
         }
 
-        // Redirection application
-        window.location.href = "accueil.html";
+        // ===============================
+        // REDIRECTION
+        // ===============================
+
+        window.location.href =
+            "accueil.html";
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Erreur connexion Firebase :",
+            error
+        );
 
         erreur.innerText =
-            "❌ Erreur connexion";
+            "❌ Identifiants incorrects";
     }
 }
-
 
 // ===============================
 // CHARGEMENT ÉTAT SYSTÈME
