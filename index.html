@@ -73,11 +73,7 @@ import { db, auth } from "./firebase-config.js";
 import { ajouterHistorique } from "./historique.js";
 import {
     doc,
-    getDoc,
-    collection,
-    query,
-    where,
-    getDocs,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
     signInWithEmailAndPassword,
@@ -144,26 +140,30 @@ async function connexion() {
         const emailFirebase =
             login + "@aiglescan.local";
 
+        const userCredential =
         await signInWithEmailAndPassword(
             auth,
             emailFirebase,
             password
         );
-
+        const uid = userCredential.user.uid;
 
         // ===============================
         // VÉRIFICATION UTILISATEUR
         // ===============================
 
-        const q = query(
-            collection(db, "utilisateurs"),
-            where("login", "==", login)
-        );
+        const utilisateurRef =
+            doc(
+                db,
+                "utilisateurs",
+                uid
+            );
 
-        const querySnapshot =
-            await getDocs(q);
+        const utilisateurSnap =
+            await getDoc(utilisateurRef);
 
-        if (querySnapshot.empty) {
+
+        if (!utilisateurSnap.exists()) {
 
             await signOut(auth);
 
@@ -176,7 +176,7 @@ async function connexion() {
             return;
         }
 
-        const utilisateur = querySnapshot.docs[0].data();
+        const utilisateur = utilisateurSnap.data();
         const estAdmin = utilisateur.role === "admin";
 
         // ===============================
