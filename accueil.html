@@ -165,17 +165,14 @@
 import { db, auth } from "./firebase-config.js";
 import { ajouterHistorique } from "./historique.js";
 import {
-    collection,
-    query,
-    where,
-    getDocs,
     doc,
     getDoc,
     updateDoc
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
-    signOut
+    signOut,
+    onAuthStateChanged
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -246,38 +243,58 @@ async function deconnexion() {
 // ===============================
 // DETAILS CONNEXION UTILISATEUR
 // ===============================
-async function chargerNomUtilisateur() {
-
-    let login = localStorage.getItem("utilisateur");
-
-    if (!login) {
-        return;
-    }
+async function chargerNomUtilisateur(user) {
 
     try {
 
-        const q = query(
-            collection(db, "utilisateurs"),
-            where("login", "==", login)
-        );
+        const utilisateurRef =
+            doc(
+                db,
+                "utilisateurs",
+                user.uid
+            );
 
-        const querySnapshot =
-            await getDocs(q);
+        const utilisateurSnap =
+            await getDoc(utilisateurRef);
 
-        if (!querySnapshot.empty) {
 
-            let utilisateur =
-                querySnapshot.docs[0].data();
+        if (!utilisateurSnap.exists()) {
 
-            document.getElementById("nomUtilisateur")
-                .innerText =
-                "Connecté : " +
-                (utilisateur.nom || login);
+            document.getElementById(
+                "nomUtilisateur"
+            ).innerText =
+                "Utilisateur inconnu";
+
+            return;
         }
+
+
+        const utilisateur =
+            utilisateurSnap.data();
+
+
+        document.getElementById(
+            "nomUtilisateur"
+        ).innerText =
+            "Connecté : " +
+            (
+                utilisateur.nom ||
+                utilisateur.login ||
+                "-"
+            );
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Erreur chargement utilisateur :",
+            error
+        );
+
+        document.getElementById(
+            "nomUtilisateur"
+        ).innerText =
+            "Erreur utilisateur";
     }
 }
 
@@ -285,35 +302,64 @@ async function chargerNomUtilisateur() {
 // ===============================
 // VÉRIFICATION ADMIN
 // ===============================
-async function verifierAdmin() {
-
-    let login =
-        localStorage.getItem("utilisateur");
-
-    if (!login) {
-        return;
-    }
+async function verifierAdmin(user) {
 
     try {
 
-        const q = query(
-            collection(db, "utilisateurs"),
-            where("login", "==", login),
-            where("role", "==", "admin")
-        );
+        const utilisateurRef =
+            doc(
+                db,
+                "utilisateurs",
+                user.uid
+            );
 
-        const querySnapshot =
-            await getDocs(q);
+        const utilisateurSnap =
+            await getDoc(utilisateurRef);
 
-        if (!querySnapshot.empty) {
 
-            document.getElementById("adminPanel").style.display =
-                "block";
+        if (!utilisateurSnap.exists()) {
+
+            document.getElementById(
+                "adminPanel"
+            ).style.display = "none";
+
+            return false;
         }
+
+
+        const utilisateur =
+            utilisateurSnap.data();
+
+
+        if (utilisateur.role === "admin") {
+
+            document.getElementById(
+                "adminPanel"
+            ).style.display = "block";
+
+            return true;
+        }
+
+
+        document.getElementById(
+            "adminPanel"
+        ).style.display = "none";
+
+        return false;
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Erreur vérification admin :",
+            error
+        );
+
+        document.getElementById(
+            "adminPanel"
+        ).style.display = "none";
+
+        return false;
     }
 }
 
@@ -321,16 +367,21 @@ async function verifierAdmin() {
 // ===============================
 // MODE MAINTENANCE ADMIN
 // ===============================
-
 async function changerModeMaintenance() {
 
     try {
 
-        // Récupération de l'utilisateur connecté
-        const login =
-            localStorage.getItem("utilisateur");
+        // ===============================
+        // UTILISATEUR FIREBASE
+        // ===============================
 
-        if (!login) {
+        const user =
+            auth.currentUser;
+
+        if (!user) {
+
+            alert("❌ Utilisateur non connecté");
+
             return;
         }
 
@@ -339,16 +390,30 @@ async function changerModeMaintenance() {
         // VÉRIFICATION ADMIN
         // ===============================
 
-        const q = query(
-            collection(db, "utilisateurs"),
-            where("login", "==", login),
-            where("role", "==", "admin")
-        );
+        const utilisateurRef =
+            doc(
+                db,
+                "utilisateurs",
+                user.uid
+            );
 
-        const querySnapshot =
-            await getDocs(q);
+        const utilisateurSnap =
+            await getDoc(utilisateurRef);
 
-        if (querySnapshot.empty) {
+
+        if (!utilisateurSnap.exists()) {
+
+            alert("❌ Utilisateur introuvable");
+
+            return;
+        }
+
+
+        const utilisateur =
+            utilisateurSnap.data();
+
+
+        if (utilisateur.role !== "admin") {
 
             alert("❌ Accès refusé");
 
@@ -360,22 +425,29 @@ async function changerModeMaintenance() {
         // CONFIGURATION SYSTÈME
         // ===============================
 
-        const docRef =
-            doc(db, "configuration", "systeme");
+        const configurationRef =
+            doc(
+                db,
+                "configuration",
+                "systeme"
+            );
 
-        const docSnap =
-            await getDoc(docRef);
+        const configurationSnap =
+            await getDoc(configurationRef);
 
-        if (!docSnap.exists()) {
 
-            alert("❌ Configuration système introuvable");
+        if (!configurationSnap.exists()) {
+
+            alert(
+                "❌ Configuration système introuvable"
+            );
 
             return;
         }
 
 
         const maintenanceActuelle =
-            docSnap.data().maintenance === true;
+            configurationSnap.data().maintenance === true;
 
         const nouvelleMaintenance =
             !maintenanceActuelle;
@@ -386,7 +458,7 @@ async function changerModeMaintenance() {
         // ===============================
 
         await updateDoc(
-            docRef,
+            configurationRef,
             {
                 maintenance: nouvelleMaintenance
             }
@@ -414,11 +486,15 @@ async function changerModeMaintenance() {
 
         if (nouvelleMaintenance) {
 
-            alert("🔴 Mode maintenance activé");
+            alert(
+                "🔴 Mode maintenance activé"
+            );
 
         } else {
 
-            alert("🟢 Mode maintenance désactivé");
+            alert(
+                "🟢 Mode maintenance désactivé"
+            );
         }
 
 
@@ -437,7 +513,7 @@ async function changerModeMaintenance() {
 
 
 // ===============================
-// RACCOURCI CTRL + C
+// RACCOURCI CTRL + ALT + B
 // ===============================
 
 document.addEventListener(
@@ -446,18 +522,53 @@ document.addEventListener(
 
         if (
             event.ctrlKey &&
-            event.key.toLowerCase() === "c"
+            event.altKey &&
+            event.key.toLowerCase() === "b"
         ) {
 
             event.preventDefault();
+
+            // Évite plusieurs déclenchements
+            // si la touche reste appuyée
+            if (event.repeat) {
+                return;
+            }
 
             await changerModeMaintenance();
         }
     }
 );
 
-verifierAdmin();
-chargerNomUtilisateur();
+// ===============================
+// INITIALISATION AUTHENTIFICATION
+// ===============================
+onAuthStateChanged(
+    auth,
+    async (user) => {
+
+        if (!user) {
+
+            localStorage.removeItem("utilisateur");
+            localStorage.removeItem("fichierActif");
+
+            window.location.href =
+                "index.html";
+
+            return;
+        }
+
+
+        // Affichage du nom
+        await chargerNomUtilisateur(user);
+
+
+        // Vérification des droits admin
+        await verifierAdmin(user);
+    }
+);
+
+
+window.deconnexion = deconnexion;
 window.deconnexion = deconnexion;
 
 </script>
