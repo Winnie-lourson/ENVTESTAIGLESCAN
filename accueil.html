@@ -162,7 +162,7 @@
 
 <script type="module">
 
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 import { ajouterHistorique } from "./historique.js";
 import {
     collection,
@@ -171,6 +171,10 @@ import {
     getDocs
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+    signOut
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 if (!localStorage.getItem("utilisateur")) { window.location.href = "index.html"; }
 
@@ -179,21 +183,60 @@ if (!localStorage.getItem("utilisateur")) { window.location.href = "index.html";
 // ===============================
 async function deconnexion() {
 
-    let utilisateur =
+    const utilisateur =
         localStorage.getItem("utilisateur");
 
-    await ajouterHistorique(
-        "Déconnexion utilisateur",
-        "",
-        {
-            login: utilisateur
-        }
-    );
+    try {
 
-    localStorage.removeItem("utilisateur");
+        // ===============================
+        // HISTORIQUE
+        // ===============================
 
-    window.location.href =
-        "index.html";
+        await ajouterHistorique(
+            "Déconnexion utilisateur",
+            "",
+            {
+                login: utilisateur
+            }
+        );
+
+
+        // ===============================
+        // DÉCONNEXION FIREBASE
+        // ===============================
+
+        await signOut(auth);
+
+
+        // ===============================
+        // NETTOYAGE SESSION LOCALE
+        // ===============================
+
+        localStorage.removeItem("utilisateur");
+        localStorage.removeItem("fichierActif");
+
+
+        // ===============================
+        // RETOUR CONNEXION
+        // ===============================
+
+        window.location.href = "index.html";
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur lors de la déconnexion :",
+            error
+        );
+
+        // Même en cas d'erreur,
+        // on nettoie la session locale.
+        localStorage.removeItem("utilisateur");
+        localStorage.removeItem("fichierActif");
+
+        window.location.href = "index.html";
+    }
 }
 
 
@@ -202,8 +245,7 @@ async function deconnexion() {
 // ===============================
 async function chargerNomUtilisateur() {
 
-    let login =
-        localStorage.getItem("utilisateur");
+    let login = localStorage.getItem("utilisateur");
 
     if (!login) {
         return;
