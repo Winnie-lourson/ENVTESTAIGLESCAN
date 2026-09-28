@@ -515,29 +515,27 @@ async function changerModeMaintenance() {
 // ===============================
 // RACCOURCI CTRL + ALT + B
 // ===============================
+document.addEventListener("keydown", async function(event) {
 
-document.addEventListener(
-    "keydown",
-    async function(event) {
+    if (
+        event.ctrlKey === true &&
+        event.altKey === true &&
+        event.code === "KeyB"
+    ) {
 
-        if (
-            event.ctrlKey &&
-            event.altKey &&
-            event.key.toLowerCase() === "b"
-        ) {
+        event.preventDefault();
+        event.stopPropagation();
 
-            event.preventDefault();
-
-            // Évite plusieurs déclenchements
-            // si la touche reste appuyée
-            if (event.repeat) {
-                return;
-            }
-
-            await changerModeMaintenance();
+        if (event.repeat) {
+            return;
         }
+
+        console.log("Raccourci maintenance détecté");
+
+        await changerModeMaintenance();
     }
-);
+
+});
 
 // ===============================
 // INITIALISATION AUTHENTIFICATION
@@ -567,8 +565,6 @@ onAuthStateChanged(
     }
 );
 
-
-window.deconnexion = deconnexion;
 window.deconnexion = deconnexion;
 
 </script>
