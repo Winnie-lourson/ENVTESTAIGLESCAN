@@ -74,14 +74,14 @@ import { ajouterHistorique } from "./historique.js";
 import {
     doc,
     getDoc,
-    updateDoc,
     collection,
     query,
     where,
     getDocs,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
-    signInWithEmailAndPassword
+    signInWithEmailAndPassword,
+    signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // ===============================
@@ -165,11 +165,19 @@ async function connexion() {
 
         if (querySnapshot.empty) {
 
+            await signOut(auth);
+
+            localStorage.removeItem("utilisateur");
+            localStorage.removeItem("fichierActif");
+
             erreur.innerText =
                 "❌ Utilisateur non reconnu";
 
             return;
         }
+
+        const utilisateur = querySnapshot.docs[0].data();
+        const estAdmin = utilisateur.role === "admin";
 
         // ===============================
         // SAUVEGARDE SESSION
@@ -196,11 +204,20 @@ async function connexion() {
         // VÉRIFICATION MAINTENANCE
         // ===============================
 
-        if (window.systemeHorsService) {
+        if (
+            window.systemeHorsService &&
+            !estAdmin
+        ) {
 
-            alert(
-                "❌ Système actuellement hors service"
-            );
+            // Déconnexion réelle de Firebase
+            await signOut(auth);
+
+            // Nettoyage de la session locale
+            localStorage.removeItem("utilisateur");
+            localStorage.removeItem("fichierActif");
+
+            erreur.innerText =
+                "❌ Système actuellement hors service";
 
             return;
         }
@@ -279,55 +296,6 @@ async function chargerEtatSysteme() {
         console.error(error);
     }
 }
-
-
-// ===============================
-// RACCOURCI ADMIN CTRL + C
-// ===============================
-document.addEventListener("keydown", async function(event) {
-
-    if (event.ctrlKey && event.key.toLowerCase() === "c") {
-
-        event.preventDefault();
-
-        let password =
-            prompt("Mot de passe administrateur");
-
-        if (password !== "aiglescan1853") {
-
-            alert("❌ Mot de passe incorrect");
-
-            return;
-        }
-
-        try {
-
-            const docRef =
-                doc(db, "configuration", "systeme");
-
-            const docSnap =
-                await getDoc(docRef);
-
-            let actuel =
-                docSnap.data().maintenance;
-
-            await updateDoc(docRef, {
-                maintenance: !actuel
-            });
-
-            chargerEtatSysteme();
-
-            alert("✅ État système modifié");
-
-        } catch (error) {
-
-            console.error(error);
-
-            alert("❌ Erreur Firebase");
-        }
-    }
-});
-
 
 // ===============================
 // INIT

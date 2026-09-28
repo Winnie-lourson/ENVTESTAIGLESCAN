@@ -168,7 +168,10 @@ import {
     collection,
     query,
     where,
-    getDocs
+    getDocs,
+    doc,
+    getDoc,
+    updateDoc
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
@@ -313,6 +316,145 @@ async function verifierAdmin() {
         console.error(error);
     }
 }
+
+
+// ===============================
+// MODE MAINTENANCE ADMIN
+// ===============================
+
+async function changerModeMaintenance() {
+
+    try {
+
+        // Récupération de l'utilisateur connecté
+        const login =
+            localStorage.getItem("utilisateur");
+
+        if (!login) {
+            return;
+        }
+
+
+        // ===============================
+        // VÉRIFICATION ADMIN
+        // ===============================
+
+        const q = query(
+            collection(db, "utilisateurs"),
+            where("login", "==", login),
+            where("role", "==", "admin")
+        );
+
+        const querySnapshot =
+            await getDocs(q);
+
+        if (querySnapshot.empty) {
+
+            alert("❌ Accès refusé");
+
+            return;
+        }
+
+
+        // ===============================
+        // CONFIGURATION SYSTÈME
+        // ===============================
+
+        const docRef =
+            doc(db, "configuration", "systeme");
+
+        const docSnap =
+            await getDoc(docRef);
+
+        if (!docSnap.exists()) {
+
+            alert("❌ Configuration système introuvable");
+
+            return;
+        }
+
+
+        const maintenanceActuelle =
+            docSnap.data().maintenance === true;
+
+        const nouvelleMaintenance =
+            !maintenanceActuelle;
+
+
+        // ===============================
+        // MODIFICATION FIRESTORE
+        // ===============================
+
+        await updateDoc(
+            docRef,
+            {
+                maintenance: nouvelleMaintenance
+            }
+        );
+
+
+        // ===============================
+        // HISTORIQUE
+        // ===============================
+
+        await ajouterHistorique(
+            nouvelleMaintenance
+                ? "Activation maintenance"
+                : "Désactivation maintenance",
+            "",
+            {
+                maintenance: nouvelleMaintenance
+            }
+        );
+
+
+        // ===============================
+        // MESSAGE
+        // ===============================
+
+        if (nouvelleMaintenance) {
+
+            alert("🔴 Mode maintenance activé");
+
+        } else {
+
+            alert("🟢 Mode maintenance désactivé");
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur modification maintenance :",
+            error
+        );
+
+        alert(
+            "❌ Impossible de modifier le mode maintenance"
+        );
+    }
+}
+
+
+// ===============================
+// RACCOURCI CTRL + C
+// ===============================
+
+document.addEventListener(
+    "keydown",
+    async function(event) {
+
+        if (
+            event.ctrlKey &&
+            event.key.toLowerCase() === "c"
+        ) {
+
+            event.preventDefault();
+
+            await changerModeMaintenance();
+        }
+    }
+);
 
 verifierAdmin();
 chargerNomUtilisateur();
