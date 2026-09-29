@@ -1,0 +1,57 @@
+#alerteSession {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 99999;
+}
+
+.alerte-session-contenu {
+    width: min(90%, 420px);
+
+    background: white;
+
+    padding: 28px;
+
+    border-radius: 18px;
+
+    text-align: center;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+.alerte-session-contenu strong {
+    display: block;
+
+    font-size: 22px;
+
+    margin-bottom: 12px;
+}
+
+.alerte-session-contenu p {
+    font-size: 16px;
+
+    margin-bottom: 20px;
+}
+
+#compteurSession {
+    font-weight: bold;
+}
+
+#btnResterConnecte {
+    border: none;
+
+    padding: 12px 22px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}

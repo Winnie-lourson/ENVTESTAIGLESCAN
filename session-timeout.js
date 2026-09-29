@@ -6,13 +6,130 @@ import {
 
 
 // ==========================================
-// DURÉE AVANT DÉCONNEXION
+// DURÉES - MODE TEST
 // ==========================================
 
-// 30 minutes
+// Déconnexion après 30 secondes
 const DUREE_INACTIVITE = 30 * 1000;
 
-let timerInactivite;
+// Avertissement 10 secondes avant
+const DELAI_AVERTISSEMENT =
+    DUREE_INACTIVITE - (10 * 1000);
+
+
+let timerAvertissement;
+let timerDeconnexion;
+
+
+// ==========================================
+// CRÉATION DU MESSAGE
+// ==========================================
+
+function creerAvertissement() {
+
+    if (document.getElementById("alerteSession")) {
+        return;
+    }
+
+    const alerte = document.createElement("div");
+
+    alerte.id = "alerteSession";
+
+    alerte.innerHTML = `
+        <div class="alerte-session-contenu">
+
+            <strong>Session inactive</strong>
+
+            <p>
+                Déconnexion automatique dans
+                <span id="compteurSession">10</span>
+                seconde(s).
+            </p>
+
+            <button id="btnResterConnecte">
+                Rester connecté
+            </button>
+
+        </div>
+    `;
+
+    document.body.appendChild(alerte);
+
+
+    // Bouton rester connecté
+    document
+        .getElementById("btnResterConnecte")
+        .addEventListener(
+            "click",
+            function () {
+
+                supprimerAvertissement();
+                reinitialiserTimer();
+            }
+        );
+}
+
+
+// ==========================================
+// SUPPRESSION MESSAGE
+// ==========================================
+
+function supprimerAvertissement() {
+
+    const alerte =
+        document.getElementById("alerteSession");
+
+    if (alerte) {
+        alerte.remove();
+    }
+}
+
+
+// ==========================================
+// COMPTE À REBOURS
+// ==========================================
+
+let intervalCompteur;
+
+function lancerAvertissement() {
+
+    creerAvertissement();
+
+    let secondesRestantes = 10;
+
+    const compteur =
+        document.getElementById("compteurSession");
+
+    if (compteur) {
+        compteur.textContent = secondesRestantes;
+    }
+
+
+    clearInterval(intervalCompteur);
+
+    intervalCompteur = setInterval(
+        function () {
+
+            secondesRestantes--;
+
+            const compteur =
+                document.getElementById(
+                    "compteurSession"
+                );
+
+            if (compteur) {
+                compteur.textContent =
+                    secondesRestantes;
+            }
+
+            if (secondesRestantes <= 0) {
+                clearInterval(intervalCompteur);
+            }
+
+        },
+        1000
+    );
+}
 
 
 // ==========================================
@@ -21,12 +138,27 @@ let timerInactivite;
 
 function reinitialiserTimer() {
 
-    clearTimeout(timerInactivite);
+    clearTimeout(timerAvertissement);
+    clearTimeout(timerDeconnexion);
+    clearInterval(intervalCompteur);
 
-    timerInactivite = setTimeout(
-        deconnexionAutomatique,
-        DUREE_INACTIVITE
-    );
+    supprimerAvertissement();
+
+
+    // Message après 20 secondes
+    timerAvertissement =
+        setTimeout(
+            lancerAvertissement,
+            DELAI_AVERTISSEMENT
+        );
+
+
+    // Déconnexion après 30 secondes
+    timerDeconnexion =
+        setTimeout(
+            deconnexionAutomatique,
+            DUREE_INACTIVITE
+        );
 }
 
 
@@ -35,6 +167,8 @@ function reinitialiserTimer() {
 // ==========================================
 
 async function deconnexionAutomatique() {
+
+    clearInterval(intervalCompteur);
 
     try {
 
@@ -52,13 +186,14 @@ async function deconnexionAutomatique() {
         localStorage.removeItem("utilisateur");
         localStorage.removeItem("fichierActif");
 
-        window.location.href = "index.html";
+        window.location.href =
+            "index.html";
     }
 }
 
 
 // ==========================================
-// ACTIVITÉS UTILISATEUR
+// ACTIVITÉ UTILISATEUR
 // ==========================================
 
 const evenementsActivite = [
@@ -68,12 +203,27 @@ const evenementsActivite = [
     "scroll"
 ];
 
+
 evenementsActivite.forEach(
     evenement => {
 
         document.addEventListener(
             evenement,
-            reinitialiserTimer,
+            function (event) {
+
+                // IMPORTANT :
+                // Une interaction avec l'alerte
+                // est gérée séparément.
+
+                if (
+                    event.target.closest &&
+                    event.target.closest("#alerteSession")
+                ) {
+                    return;
+                }
+
+                reinitialiserTimer();
+            },
             { passive: true }
         );
     }
