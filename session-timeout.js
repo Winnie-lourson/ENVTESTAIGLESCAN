@@ -9,13 +9,12 @@ import {
 // DURÉES - MODE TEST
 // ==========================================
 
-// Déconnexion après 30 secondes
-const DUREE_INACTIVITE = 30 * 1000;
+// Déconnexion après 40 minutes
+const DUREE_INACTIVITE = 40 * 60 * 1000;
 
-// Avertissement 10 secondes avant
-const DELAI_AVERTISSEMENT =
-    DUREE_INACTIVITE - (10 * 1000);
-
+// Avertissement 2 minutes avant
+const DUREE_AVERTISSEMENT = 2 * 60 * 1000;
+const DELAI_AVERTISSEMENT = DUREE_INACTIVITE - DUREE_AVERTISSEMENT;
 
 let timerAvertissement;
 let timerDeconnexion;
@@ -42,7 +41,7 @@ function creerAvertissement() {
 
             <p>
                 Déconnexion automatique dans
-                <span id="compteurSession">10</span>
+                <span id="compteurSession">120</span>
                 seconde(s).
             </p>
 
@@ -95,7 +94,7 @@ function lancerAvertissement() {
 
     creerAvertissement();
 
-    let secondesRestantes = 10;
+    let secondesRestantes = DUREE_AVERTISSEMENT / 1000;
 
     const compteur =
         document.getElementById("compteurSession");
