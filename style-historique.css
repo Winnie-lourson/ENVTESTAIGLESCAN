@@ -458,37 +458,17 @@ h2 {
    HEADER STICKY
 ======================================== */
 
-#tableHistorique thead {
-    position: relative;
-    z-index: 1000;
-}
-
-#tableHistorique thead tr {
-    background: #0f2d62;
-}
-
 #tableHistorique thead th {
 
     position: sticky;
 
-    /*
-       Barre :
-       top = 75px
-       hauteur = 28px
-
-       75 + 28 = 103px
-
-       + petit espace = 105px
-    */
+    /* Juste sous la barre horizontale */
     top: 105px;
 
-    z-index: 1000;
+    z-index: 1002;
 
     background: #0f2d62 !important;
-    color: #ffffff !important;
-
-    opacity: 1;
-    visibility: visible;
+    color: white !important;
 
     padding: 16px;
 
@@ -585,9 +565,7 @@ h2 {
    ANIMATION
 ======================================== */
 
-.filtres-historique,
-.historique-container {
-
+.filtres-historique {
     animation: apparition 0.3s ease;
 }
 
