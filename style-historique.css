@@ -429,7 +429,7 @@ h2 {
 
     border-radius: 28px;
 
-    overflow: hidden;
+    overflow: visible;
 
     position: relative;
 
@@ -455,29 +455,56 @@ h2 {
 }
 
 /* ========================================
-   HEADER
+   HEADER STICKY
 ======================================== */
 
 #tableHistorique thead {
     position: relative;
-    z-index: 20;
+    z-index: 1000;
 }
 
 #tableHistorique thead tr {
-    position: relative;
-    z-index: 20;
     background: #0f2d62;
 }
 
 #tableHistorique thead th {
-    position: relative;
-    z-index: 21;
+
+    position: sticky;
+
+    /*
+       Barre :
+       top = 75px
+       hauteur = 28px
+
+       75 + 28 = 103px
+
+       + petit espace = 105px
+    */
+    top: 105px;
+
+    z-index: 1000;
 
     background: #0f2d62 !important;
     color: #ffffff !important;
 
     opacity: 1;
     visibility: visible;
+
+    padding: 16px;
+
+    border-right:
+        1px solid rgba(255,255,255,0.08);
+
+    font-size: 14px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    white-space: nowrap;
+
+    box-shadow:
+        0 5px 8px rgba(15,45,98,0.18);
 }
 
 #tableHistorique th {
