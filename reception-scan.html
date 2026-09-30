@@ -760,13 +760,26 @@ async function finDeScan() {
     // Enregistrement Firebase
     try { 
             
-            await addDoc(collection(db, "fichiersScans"), {
-            nom: nomFichier,
-            type: "reception",
-            dateCreation: new Date().toLocaleDateString(),
-            totalScans: donneesScan.length,
-            contenu: donneesScan
-        });
+        console.log("1 - Début création fichier");
+
+        const fichierCree = await addDoc(
+            collection(db, "fichiersScans"),
+            {
+                nom: nomFichier,
+                type: "reception",
+                dateCreation: new Date().toLocaleDateString(),
+                totalScans: donneesScan.length,
+                contenu: donneesScan
+            }
+        );
+
+        console.log(
+            "2 - Fichier créé avec succès :",
+            fichierCree.id
+        );
+
+
+        console.log("3 - Début historique");
 
         await ajouterHistorique(
             "Création fichier réception",
@@ -779,18 +792,20 @@ async function finDeScan() {
             }
         );
 
-        alert("✅ Fichier enregistré avec succès");
+        console.log("4 - Historique créé");
 
-        window.location.href = "accueil.html";
+                alert("✅ Fichier enregistré avec succès");
 
-    } catch (error) {
+                window.location.href = "accueil.html";
 
-        console.error("Erreur Firebase :", error);
+            } catch (error) {
 
-        alert("❌ Erreur lors de l’enregistrement");
-    }
+                console.error("Erreur Firebase :", error);
 
-}
+                alert("❌ Erreur lors de l’enregistrement");
+            }
+
+        }
 
 
 // ===============================
