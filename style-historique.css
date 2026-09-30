@@ -444,22 +444,7 @@ h2 {
 ======================================== */
 
 .historique-container::before {
-
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-    left: 0;
-    right: 0;
-
-    height: 58px;
-
-    background: #0f2d62;
-
-    z-index: 5;
-
-    pointer-events: none;
+    display: none;
 }
 
 #tableHistorique {
@@ -478,18 +463,9 @@ h2 {
 ======================================== */
 
 #tableHistorique thead {
-
-    position: sticky;
-
-    top: 110px;
-
-    z-index: 1000;
-
+    position: relative;
+    z-index: 10;
     background: #0f2d62;
-
-    box-shadow: 0 5px 10px rgba(15,45,98,0.22);
-
-    isolation: isolate;
 }
 
 #tableHistorique th {
