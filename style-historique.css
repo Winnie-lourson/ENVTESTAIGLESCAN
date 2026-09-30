@@ -440,40 +440,8 @@ h2 {
 }
 
 /* ========================================
-   MASQUE SOUS L'EN-TÊTE
-======================================== */
-
-.historique-container::before {
-    display: none;
-}
-
-#tableHistorique {
-
-    width: 100%;
-
-    min-width: 1700px;
-
-    border-collapse: collapse;
-}
-
-/* ========================================
    HEADER
 ======================================== */
-
-#tableHistorique thead {
-
-    position: sticky;
-
-    top: 110px;
-
-    z-index: 1000;
-
-    background: #0f2d62;
-
-    box-shadow: 0 5px 10px rgba(15,45,98,0.22);
-
-    isolation: isolate;
-}
 
 #tableHistorique th {
 
@@ -553,7 +521,9 @@ h2 {
    ANIMATION
 ======================================== */
 
-.filtres-historique {
+.filtres-historique,
+.historique-container {
+
     animation: apparition 0.3s ease;
 }
 
