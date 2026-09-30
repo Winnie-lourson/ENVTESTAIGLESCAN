@@ -419,9 +419,7 @@ h2 {
 .historique-container {
 
     width: 95%;
-
     max-width: 1800px;
-
     margin: auto;
 
     background:
@@ -431,7 +429,7 @@ h2 {
 
     border-radius: 28px;
 
-    overflow: clip;
+    overflow: hidden;
 
     position: relative;
 
@@ -454,8 +452,6 @@ h2 {
     min-width: 1700px;
 
     border-collapse: collapse;
-
-    isolation: isolate;
 }
 
 /* ========================================
@@ -464,8 +460,24 @@ h2 {
 
 #tableHistorique thead {
     position: relative;
-    z-index: 10;
+    z-index: 20;
+}
+
+#tableHistorique thead tr {
+    position: relative;
+    z-index: 20;
     background: #0f2d62;
+}
+
+#tableHistorique thead th {
+    position: relative;
+    z-index: 21;
+
+    background: #0f2d62 !important;
+    color: #ffffff !important;
+
+    opacity: 1;
+    visibility: visible;
 }
 
 #tableHistorique th {
