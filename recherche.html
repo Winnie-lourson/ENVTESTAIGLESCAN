@@ -25,7 +25,7 @@
 </div>
 
 <h1>RECHERCHE</h1>
-<h2>Recherche logistique par scan</h2>
+<h2>Recherche par scan</h2>
 
 <main class="zone-recherche">
 
@@ -67,7 +67,7 @@
             </div>
 
             <div class="information-card">
-                <span>Dernier emplacement connu</span>
+                <span>Emplacement</span>
                 <strong id="resultatEmplacement">-</strong>
             </div>
 
@@ -86,7 +86,7 @@
                 <thead>
                     <tr>
                         <th>N° BT</th>
-                        <th>Support</th>
+                        <th>État du stock</th>
                     </tr>
                 </thead>
 
@@ -239,12 +239,62 @@ function normaliserEmplacement(adresse) {
 
 
 // ==========================================
+// CALCUL GLOBAL DU STOCK PAR BT
+// ==========================================
+
+function calculerStockGlobal() {
+
+    const stockParBT = new Map();
+
+    fichiers.forEach(fichier => {
+
+        if (
+            fichier.type !== "reception" &&
+            fichier.type !== "expedition"
+        ) {
+            return;
+        }
+
+        (fichier.contenu || []).forEach(scan => {
+
+            const bt = String(scan.bt || "").trim();
+
+            if (!bt) return;
+
+            if (!stockParBT.has(bt)) {
+
+                stockParBT.set(bt, {
+                    receptions: 0,
+                    expeditions: 0
+                });
+            }
+
+            const stock = stockParBT.get(bt);
+
+            if (fichier.type === "reception") {
+                stock.receptions++;
+            }
+
+            if (fichier.type === "expedition") {
+                stock.expeditions++;
+            }
+
+        });
+    });
+
+    return stockParBT;
+}
+
+
+// ==========================================
 // RECHERCHE
 // ==========================================
 
 function rechercher() {
 
     const valeur = champRecherche.value.trim();
+    
+    messageRecherche.style.color = "";
 
     if (!valeur) {
         messageRecherche.textContent =
@@ -331,9 +381,97 @@ function rechercher() {
 
     if (typeRecherche === "BT") {
 
-        correspondances = scans.filter(
+        // ======================================
+        // CONTRÔLE BT SUR PLUSIEURS SUPPORTS
+        // ======================================
+
+        // Toutes les réceptions du BT recherché
+        const receptionsBT = scans.filter(s =>
+            s.type === "reception" &&
+            s.bt === valeur
+        );
+
+        // Liste des supports de réception distincts
+        const supportsReception = new Set(
+            receptionsBT
+                .map(s => s.support)
+                .filter(Boolean)
+        );
+
+        // Anomalie si plusieurs supports différents
+        if (supportsReception.size > 1) {
+
+            document.getElementById("resultats")
+                .style.display = "none";
+
+            messageRecherche.textContent =
+                "❌ Anomalie : ce numéro de BT est associé à plusieurs supports de réception différents.";
+
+            messageRecherche.style.color = "#dc2626";
+
+            return;
+        }
+
+        // ======================================
+        // RECHERCHE DU BT SCANNÉ
+        // ======================================
+
+        const colisTrouves = scans.filter(
             s => s.bt === valeur
         );
+
+        // ======================================
+        // IDENTIFICATION DE LA PALETTE
+        // Priorité aux données de réception
+        // ======================================
+
+        const colisReference =
+            receptionsBT.find(s => s.support) ||
+            receptionsBT[0] ||
+            colisTrouves.find(s => s.support) ||
+            colisTrouves[0];
+
+        const supportPalette =
+            colisReference?.support || "";
+
+        const internePalette =
+            colisReference?.interne || "";
+
+        // ======================================
+        // TOUS LES BT DE LA MÊME PALETTE
+        // ======================================
+
+        correspondances = scans.filter(s => {
+
+            if (supportPalette) {
+
+                // Recherche par support de réception
+                if (
+                    s.type === "reception" &&
+                    s.support === supportPalette
+                ) {
+                    return true;
+                }
+
+                // Récupère également les expéditions
+                // des BT appartenant à la palette
+                const btReceptionPalette = scans.some(r =>
+                    r.type === "reception" &&
+                    r.support === supportPalette &&
+                    r.bt === s.bt
+                );
+
+                return btReceptionPalette;
+            }
+
+            // Si aucun support n'est disponible,
+            // recherche par numéro interne
+            if (internePalette) {
+                return s.interne === internePalette;
+            }
+
+            return s.bt === valeur;
+        });
 
     } else if (typeRecherche === "SUPPORT") {
 
@@ -441,70 +579,54 @@ function rechercher() {
     // Emplacement affiché
     const dernierEmplacement =
         emplacementsActuels.join(", ") || "-";
-
+        
 
     // ======================================
     // REGROUPEMENT DES BT SANS DOUBLONS
-    // PRIORITÉ AU SUPPORT RÉCEPTION
     // ======================================
 
     const lignes = new Map();
+
+    // Calcul sur tous les fichiers Firestore
+    const stockGlobal = calculerStockGlobal();
 
     correspondances.forEach(scan => {
 
         const bt = String(scan.bt || "").trim();
 
-        if (!bt) {
-            return;
-        }
+        if (!bt) return;
 
-        // Un BT = une seule ligne
         if (!lignes.has(bt)) {
 
             lignes.set(bt, {
                 bt: bt,
                 support: "",
                 interne: scan.interne,
-                reception: "-",
-                expedition: "-"
+                receptions: 0,
+                expeditions: 0
             });
         }
 
         const ligne = lignes.get(bt);
 
-        // ======================================
-        // SUPPORT RÉCEPTION PRIORITAIRE
-        // ======================================
-
-        if (scan.type === "reception") {
-
-            ligne.reception = scan.dateAffichage;
-
-            // Le support réception remplace
-            // systématiquement celui d'expédition
-            if (scan.support) {
-                ligne.support = scan.support;
-            }
-        }
-
-        // ======================================
-        // EXPÉDITION
-        // ======================================
-
-        if (scan.type === "expedition") {
-
-            ligne.expedition = scan.dateAffichage;
-
-            // Support expédition utilisé uniquement
-            // si aucune réception n'est disponible
-            if (ligne.reception === "-" && !ligne.support) {
-                ligne.support = scan.support;
-            }
+        // Priorité au support de réception
+        if (scan.type === "reception" && scan.support) {
+            ligne.support = scan.support;
         }
 
         if (!ligne.interne && scan.interne) {
             ligne.interne = scan.interne;
         }
+
+    });
+
+    // Récupération du stock réel de chaque BT
+    lignes.forEach(ligne => {
+
+        const stock = stockGlobal.get(ligne.bt);
+
+        ligne.receptions = stock?.receptions || 0;
+        ligne.expeditions = stock?.expeditions || 0;
 
     });
 
@@ -567,17 +689,41 @@ function afficherResultats(
 
         const tr = document.createElement("tr");
 
-        [
-            ligne.bt,
-            ligne.support,
-        ].forEach(valeur => {
+        const stockReel =
+            ligne.receptions - ligne.expeditions;
 
-            const td = document.createElement("td");
+        let statut = "";
+        let classeStatut = "";
 
-            td.textContent = valeur || "-";
+        if (stockReel > 0) {
+            statut = "En stock";
+            classeStatut = "en-stock";
+        } else if (stockReel === 0) {
+            statut = "Épuisé";
+            classeStatut = "epuise";
+        } else {
+            statut = "Anomalie";
+            classeStatut = "anomalie";
+        }
 
-            tr.appendChild(td);
-        });
+        // Colonne numéro BT
+        const celluleBT = document.createElement("td");
+        celluleBT.textContent = ligne.bt;
+
+        // Colonne état du stock
+        const celluleStatut = document.createElement("td");
+
+        const badge = document.createElement("span");
+
+        badge.className =
+            "badge-stock " + classeStatut;
+
+        badge.textContent = statut;
+
+        celluleStatut.appendChild(badge);
+
+        tr.appendChild(celluleBT);
+        tr.appendChild(celluleStatut);
 
         tbody.appendChild(tr);
     });
