@@ -1,0 +1,567 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Recherche logistique</title>
+
+    <link rel="stylesheet" href="style-recherche.css">
+    <link rel="stylesheet" href="style-session.css">
+    <link rel="icon" type="image/png" href="images/ASLOGOV1.png">
+</head>
+
+<body>
+
+<div class="btn-accueil">
+    <button onclick="window.location.href='accueil.html'">
+        <img src="images/accueil2-blanc.png" class="logo-action" alt="">
+        <span>Accueil</span>
+    </button>
+</div>
+
+<h1>RECHERCHE</h1>
+<h2>Recherche logistique par scan</h2>
+
+<main class="zone-recherche">
+
+    <div class="ligne-recherche">
+
+        <input
+            type="text"
+            id="codeRecherche"
+            placeholder="Scanner BT, support, interne ou emplacement"
+            autocomplete="off"
+            spellcheck="false"
+        >
+
+        <button id="btnRechercher" onclick="rechercher()">
+            Rechercher
+        </button>
+
+    </div>
+
+    <p id="messageRecherche"></p>
+
+    <section id="resultats" style="display:none;">
+
+        <div class="resultat-entete">
+            <h3 id="titreResultat"></h3>
+            <span id="typeResultat"></span>
+        </div>
+
+        <div class="informations-grid">
+
+            <div class="information-card">
+                <span>N° interne</span>
+                <strong id="resultatInterne">-</strong>
+            </div>
+
+            <div class="information-card">
+                <span>Support(s)</span>
+                <strong id="resultatSupports">-</strong>
+            </div>
+
+            <div class="information-card">
+                <span>Dernier emplacement connu</span>
+                <strong id="resultatEmplacement">-</strong>
+            </div>
+
+            <div class="information-card">
+                <span>Nombre de colis</span>
+                <strong id="resultatTotal">0</strong>
+            </div>
+
+        </div>
+
+        <h3>Colis associés</h3>
+
+        <div class="tableau-conteneur">
+
+            <table id="tableResultats">
+                <thead>
+                    <tr>
+                        <th>N° BT</th>
+                        <th>Support</th>
+                        <th>N° interne</th>
+                        <th>Réception</th>
+                        <th>Expédition</th>
+                    </tr>
+                </thead>
+
+                <tbody id="resultatsBody"></tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script type="module">
+
+import { db, auth } from "./firebase-config.js";
+
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+// ==========================================
+// VARIABLES
+// ==========================================
+
+let fichiers = [];
+let donneesChargees = false;
+
+const champRecherche =
+    document.getElementById("codeRecherche");
+
+const messageRecherche =
+    document.getElementById("messageRecherche");
+
+
+// ==========================================
+// AUTHENTIFICATION
+// ==========================================
+
+onAuthStateChanged(auth, async (user) => {
+
+    if (!user) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    await chargerDonnees();
+});
+
+
+// ==========================================
+// CHARGEMENT FIRESTORE
+// ==========================================
+
+async function chargerDonnees() {
+
+    messageRecherche.textContent =
+        "Chargement des données...";
+
+    try {
+
+        const snapshot = await getDocs(
+            collection(db, "fichiersScans")
+        );
+
+        fichiers = snapshot.docs.map(document => ({
+            id: document.id,
+            ...document.data()
+        }));
+
+        donneesChargees = true;
+
+        messageRecherche.textContent =
+            "Prêt pour le scan";
+
+        champRecherche.focus();
+
+    } catch (error) {
+
+        console.error("Erreur Firebase :", error);
+
+        messageRecherche.textContent =
+            "❌ Impossible de charger les données";
+    }
+}
+
+
+// ==========================================
+// CONVERSION DES DATES
+// ==========================================
+
+function convertirDate(valeur) {
+
+    if (!valeur) return 0;
+
+    if (typeof valeur.toMillis === "function") {
+        return valeur.toMillis();
+    }
+
+    if (typeof valeur === "string") {
+
+        const match = valeur.match(
+            /^(\d{2})\/(\d{2})\/(\d{4})$/
+        );
+
+        if (match) {
+            return new Date(
+                Number(match[3]),
+                Number(match[2]) - 1,
+                Number(match[1])
+            ).getTime();
+        }
+    }
+
+    const resultat = new Date(valeur).getTime();
+
+    return Number.isNaN(resultat) ? 0 : resultat;
+}
+
+
+// ==========================================
+// EXTRACTION N° INTERNE
+// ==========================================
+
+function extraireInterne(nom) {
+
+    const match = String(nom || "").match(/^(\d{3})/);
+
+    return match ? match[1] : "";
+}
+
+
+// ==========================================
+// RECHERCHE
+// ==========================================
+
+function rechercher() {
+
+    const valeur = champRecherche.value.trim();
+
+    if (!valeur) {
+        messageRecherche.textContent =
+            "❌ Scanner ou saisir un code";
+        return;
+    }
+
+    if (!donneesChargees) {
+        messageRecherche.textContent =
+            "Chargement en cours...";
+        return;
+    }
+
+    const scans = [];
+
+    const mouvements = [];
+
+    fichiers.forEach(fichier => {
+
+        const interne = extraireInterne(fichier.nom);
+
+        const dateFichier = convertirDate(
+            fichier.dateCreation
+        );
+
+        (fichier.contenu || []).forEach(scan => {
+
+            if (fichier.type === "adresse") {
+
+                mouvements.push({
+                    interne,
+                    support: String(scan.support || "").trim(),
+                    adresse: String(scan.adresse || "").trim(),
+                    date: convertirDate(
+                        scan.dateCreation || fichier.dateCreation
+                    ),
+                    id: fichier.id
+                });
+
+            } else if (
+                fichier.type === "reception" ||
+                fichier.type === "expedition"
+            ) {
+
+                scans.push({
+                    interne,
+                    support: String(scan.support || "").trim(),
+                    bt: String(scan.bt || "").trim(),
+                    type: fichier.type,
+                    date: dateFichier,
+                    dateAffichage:
+                        scan.date || fichier.dateCreation || "-"
+                });
+            }
+        });
+    });
+
+
+    // ======================================
+    // DÉTECTION AUTOMATIQUE
+    // ======================================
+
+    let typeRecherche = "";
+
+    if (scans.some(s => s.bt === valeur)) {
+        typeRecherche = "BT";
+    } else if (
+        scans.some(s => s.support === valeur) ||
+        mouvements.some(m => m.support === valeur)
+    ) {
+        typeRecherche = "SUPPORT";
+    } else if (/^\d{3}$/.test(valeur)) {
+        typeRecherche = "INTERNE";
+    } else {
+        typeRecherche = "EMPLACEMENT";
+    }
+
+
+    // ======================================
+    // CORRESPONDANCES
+    // ======================================
+
+    let correspondances = [];
+
+    if (typeRecherche === "BT") {
+
+        correspondances = scans.filter(
+            s => s.bt === valeur
+        );
+
+    } else if (typeRecherche === "SUPPORT") {
+
+        correspondances = scans.filter(
+            s => s.support === valeur
+        );
+
+    } else if (typeRecherche === "INTERNE") {
+
+        correspondances = scans.filter(
+            s => s.interne === valeur
+        );
+
+    } else {
+
+        // ======================================
+        // RECHERCHE PAR EMPLACEMENT
+        // ======================================
+
+        const palettesEmplacement = mouvements.filter(
+            m => m.adresse.toUpperCase() === valeur.toUpperCase()
+        );
+
+        // Numéros internes présents à cet emplacement
+        const internes = new Set(
+            palettesEmplacement
+                .map(m => m.interne)
+                .filter(Boolean)
+        );
+
+        // Supports associés à cet emplacement
+        const supports = new Set(
+            palettesEmplacement
+                .map(m => m.support)
+                .filter(Boolean)
+        );
+
+        // Recherche des BT associés aux palettes
+        correspondances = scans.filter(s => {
+
+            return (
+                supports.has(s.support) ||
+                internes.has(s.interne)
+            );
+
+        });
+    }
+
+
+    // ======================================
+    // AUCUN RÉSULTAT
+    // ======================================
+
+    if (correspondances.length === 0) {
+
+        document.getElementById("resultats")
+            .style.display = "none";
+
+        messageRecherche.textContent =
+            "❌ Aucun résultat trouvé";
+
+        return;
+    }
+
+
+    // ======================================
+    // EMPLACEMENT ACTUEL
+    // ======================================
+
+    // Supports des colis trouvés
+    const supportsTrouves = new Set(
+        correspondances
+            .map(s => s.support)
+            .filter(Boolean)
+    );
+
+    // Numéros internes des colis trouvés
+    const internesTrouves = new Set(
+        correspondances
+            .map(s => s.interne)
+            .filter(Boolean)
+    );
+
+    // Recherche des emplacements associés
+    const mouvementsAssocies = mouvements.filter(m => {
+
+        return (
+            (m.support && supportsTrouves.has(m.support)) ||
+            (m.interne && internesTrouves.has(m.interne))
+        );
+
+    });
+
+    // Suppression des doublons d'emplacement
+    const emplacementsActuels = [
+        ...new Set(
+            mouvementsAssocies
+                .map(m => m.adresse)
+                .filter(Boolean)
+        )
+    ];
+
+    // Emplacement affiché
+    const dernierEmplacement =
+        emplacementsActuels.join(", ") || "-";
+
+
+    // ======================================
+    // REGROUPEMENT DES BT
+    // ======================================
+
+    const lignes = new Map();
+
+    correspondances.forEach(scan => {
+
+        const cle = scan.bt + "|" + scan.support;
+
+        if (!lignes.has(cle)) {
+
+            lignes.set(cle, {
+                bt: scan.bt,
+                support: scan.support,
+                interne: scan.interne,
+                reception: "-",
+                expedition: "-"
+            });
+        }
+
+        const ligne = lignes.get(cle);
+
+        if (scan.type === "reception") {
+            ligne.reception = scan.dateAffichage;
+        }
+
+        if (scan.type === "expedition") {
+            ligne.expedition = scan.dateAffichage;
+        }
+    });
+
+    afficherResultats(
+        valeur,
+        typeRecherche,
+        [...lignes.values()],
+        dernierEmplacement
+    );
+}
+
+
+// ==========================================
+// AFFICHAGE
+// ==========================================
+
+function afficherResultats(
+    valeur,
+    type,
+    lignes,
+    emplacement
+) {
+
+    document.getElementById("resultats")
+        .style.display = "block";
+
+    messageRecherche.textContent = "";
+
+    document.getElementById("titreResultat")
+        .textContent = valeur;
+
+    document.getElementById("typeResultat")
+        .textContent = type;
+
+    document.getElementById("resultatInterne")
+        .textContent =
+        [...new Set(lignes.map(l => l.interne))]
+            .filter(Boolean)
+            .join(", ") || "-";
+
+    document.getElementById("resultatSupports")
+        .textContent =
+        [...new Set(lignes.map(l => l.support))]
+            .filter(Boolean)
+            .join(", ") || "-";
+
+    document.getElementById("resultatEmplacement")
+        .textContent = emplacement;
+
+    document.getElementById("resultatTotal")
+        .textContent =
+        new Set(lignes.map(l => l.bt)).size;
+
+    const tbody =
+        document.getElementById("resultatsBody");
+
+    tbody.innerHTML = "";
+
+    lignes.forEach(ligne => {
+
+        const tr = document.createElement("tr");
+
+        [
+            ligne.bt,
+            ligne.support,
+            ligne.interne,
+            ligne.reception,
+            ligne.expedition
+        ].forEach(valeur => {
+
+            const td = document.createElement("td");
+
+            td.textContent = valeur || "-";
+
+            tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+    });
+}
+
+
+// ==========================================
+// VALIDATION CLAVIER / SCANNER
+// ==========================================
+
+champRecherche.addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Enter") {
+            event.preventDefault();
+            rechercher();
+        }
+    }
+);
+
+window.rechercher = rechercher;
+
+</script>
+
+<script type="module" src="maintenance.js"></script>
+<script type="module" src="session-timeout.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,482 @@
+
+/* ========================================
+   RESET
+======================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100vh;
+
+    font-family: "Segoe UI", Arial, sans-serif;
+
+    background: linear-gradient(
+        135deg,
+        #f8fafc 0%,
+        #eef2f7 100%
+    );
+
+    color: #0f172a;
+}
+
+
+/* ========================================
+   TITRES
+======================================== */
+
+h1 {
+    text-align: center;
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #0f2d62;
+
+    margin-top: 45px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    text-align: center;
+    font-size: 21px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 30px;
+}
+
+
+/* ========================================
+   BOUTON ACCUEIL
+======================================== */
+
+.btn-accueil {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+}
+
+.btn-accueil button {
+    min-height: 50px;
+    padding: 0 18px;
+
+    border: none;
+    border-radius: 14px;
+
+    background: linear-gradient(
+        135deg,
+        #0f2d62,
+        #1e40af
+    );
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.logo-action {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+
+/* ========================================
+   ZONE PRINCIPALE
+======================================== */
+
+.zone-recherche {
+    width: 92%;
+    max-width: 1250px;
+    margin: 0 auto 50px;
+
+    padding: 30px;
+
+    background: rgba(255,255,255,0.92);
+
+    border-radius: 25px;
+
+    box-shadow:
+        0 12px 35px rgba(0,0,0,0.08);
+}
+
+
+/* ========================================
+   ZONE DE SCAN
+======================================== */
+
+.ligne-recherche {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+}
+
+#codeRecherche {
+    flex: 1;
+    min-width: 0;
+    height: 58px;
+
+    padding: 0 18px;
+
+    border: 2px solid #cbd5e1;
+    border-radius: 14px;
+
+    background: #f8fafc;
+
+    font-size: 17px;
+    color: #0f172a;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+#codeRecherche:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 4px rgba(37,99,235,0.12);
+}
+
+#btnRechercher {
+    flex-shrink: 0;
+
+    min-width: 145px;
+    height: 58px;
+
+    padding: 0 20px;
+
+    border: none;
+    border-radius: 14px;
+
+    background: linear-gradient(
+        135deg,
+        #0f2d62,
+        #2563eb
+    );
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+#btnRechercher:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(37,99,235,0.2);
+}
+
+#messageRecherche {
+    min-height: 24px;
+    margin-top: 14px;
+    text-align: center;
+
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* ========================================
+   RÉSULTATS
+======================================== */
+
+#resultats {
+    margin-top: 25px;
+}
+
+.resultat-entete {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+#titreResultat {
+    font-size: 23px;
+    font-weight: 800;
+    color: #0f2d62;
+
+    overflow-wrap: anywhere;
+}
+
+#typeResultat {
+    padding: 8px 16px;
+
+    border-radius: 999px;
+
+    background: #dbeafe;
+    color: #1d4ed8;
+
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+}
+
+
+/* ========================================
+   CARTES D'INFORMATIONS
+======================================== */
+
+.informations-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 30px;
+}
+
+.information-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    min-width: 0;
+    padding: 20px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+
+    background: #f8fafc;
+}
+
+.information-card span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.information-card strong {
+    color: #0f2d62;
+    font-size: 19px;
+    font-weight: 800;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* ========================================
+   TABLEAU DES COLIS
+======================================== */
+
+#resultats > h3 {
+    margin-bottom: 15px;
+
+    color: #0f2d62;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.tableau-conteneur {
+    width: 100%;
+    overflow-x: auto;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+
+    background: white;
+}
+
+#tableResultats {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#tableResultats th {
+    padding: 16px 14px;
+
+    background: #0f2d62;
+    color: white;
+
+    font-size: 13px;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+}
+
+#tableResultats td {
+    padding: 14px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    font-size: 14px;
+    text-align: left;
+
+    overflow-wrap: anywhere;
+}
+
+#tableResultats tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+#tableResultats tbody tr:hover {
+    background: #eff6ff;
+}
+
+#tableResultats tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* ========================================
+   TABLETTES
+======================================== */
+
+@media (max-width: 1050px) {
+
+    .informations-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .zone-recherche {
+        width: 95%;
+        padding: 22px;
+    }
+
+    h1 {
+        font-size: 40px;
+    }
+}
+
+
+/* ========================================
+   PDA / PETITS ÉCRANS
+======================================== */
+
+@media (max-width: 600px) {
+
+    h1 {
+        font-size: 28px;
+        margin-top: 85px;
+        margin-bottom: 8px;
+    }
+
+    h2 {
+        font-size: 15px;
+        margin-bottom: 20px;
+        padding: 0 12px;
+    }
+
+    .btn-accueil {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+    }
+
+    .btn-accueil button {
+        min-height: 42px;
+        padding: 0 12px;
+        font-size: 13px;
+        border-radius: 10px;
+    }
+
+    .logo-action {
+        width: 15px;
+        height: 15px;
+    }
+
+    .zone-recherche {
+        width: calc(100% - 20px);
+        margin-bottom: 25px;
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .ligne-recherche {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #codeRecherche {
+        flex: none;
+        width: 100%;
+        height: 50px;
+        font-size: 16px;
+        padding: 0 12px;
+    }
+
+    #btnRechercher {
+        width: 100%;
+        min-width: 0;
+        height: 48px;
+        font-size: 15px;
+    }
+
+    #resultats {
+        margin-top: 18px;
+    }
+
+    .resultat-entete {
+        align-items: flex-start;
+    }
+
+    #titreResultat {
+        font-size: 18px;
+    }
+
+    .informations-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 22px;
+    }
+
+    .information-card {
+        padding: 12px;
+        gap: 7px;
+        border-radius: 12px;
+    }
+
+    .information-card span {
+        font-size: 11px;
+    }
+
+    .information-card strong {
+        font-size: 14px;
+    }
+
+    #resultats > h3 {
+        font-size: 17px;
+    }
+
+    #tableResultats {
+        min-width: 650px;
+    }
+
+    #tableResultats th {
+        padding: 12px 10px;
+        font-size: 12px;
+    }
+
+    #tableResultats td {
+        padding: 11px 10px;
+        font-size: 12px;
+    }
+}
