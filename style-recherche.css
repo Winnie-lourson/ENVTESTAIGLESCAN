@@ -467,7 +467,9 @@ h2 {
     }
 
     #tableResultats {
-        min-width: 650px;
+        width: 100%;
+        min-width: 0;
+        table-layout: fixed;
     }
 
     #tableResultats th {
@@ -479,4 +481,12 @@ h2 {
         padding: 11px 10px;
         font-size: 12px;
     }
+
+    #tableResultats th,
+    #tableResultats td {
+        width: 50%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
 }

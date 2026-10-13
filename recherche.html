@@ -87,9 +87,6 @@
                     <tr>
                         <th>N° BT</th>
                         <th>Support</th>
-                        <th>N° interne</th>
-                        <th>Réception</th>
-                        <th>Expédition</th>
                     </tr>
                 </thead>
 
@@ -228,6 +225,20 @@ function extraireInterne(nom) {
 
 
 // ==========================================
+// NORMALISATION DES EMPLACEMENTS
+// ==========================================
+
+function normaliserEmplacement(adresse) {
+
+    return String(adresse || "")
+        .trim()
+        .toUpperCase()
+        .replace(/-/g, "");
+
+}
+
+
+// ==========================================
 // RECHERCHE
 // ==========================================
 
@@ -343,7 +354,9 @@ function rechercher() {
         // ======================================
 
         const palettesEmplacement = mouvements.filter(
-            m => m.adresse.toUpperCase() === valeur.toUpperCase()
+            m =>
+                normaliserEmplacement(m.adresse) ===
+                normaliserEmplacement(valeur)
         );
 
         // Numéros internes présents à cet emplacement
@@ -431,35 +444,68 @@ function rechercher() {
 
 
     // ======================================
-    // REGROUPEMENT DES BT
+    // REGROUPEMENT DES BT SANS DOUBLONS
+    // PRIORITÉ AU SUPPORT RÉCEPTION
     // ======================================
 
     const lignes = new Map();
 
     correspondances.forEach(scan => {
 
-        const cle = scan.bt + "|" + scan.support;
+        const bt = String(scan.bt || "").trim();
 
-        if (!lignes.has(cle)) {
+        if (!bt) {
+            return;
+        }
 
-            lignes.set(cle, {
-                bt: scan.bt,
-                support: scan.support,
+        // Un BT = une seule ligne
+        if (!lignes.has(bt)) {
+
+            lignes.set(bt, {
+                bt: bt,
+                support: "",
                 interne: scan.interne,
                 reception: "-",
                 expedition: "-"
             });
         }
 
-        const ligne = lignes.get(cle);
+        const ligne = lignes.get(bt);
+
+        // ======================================
+        // SUPPORT RÉCEPTION PRIORITAIRE
+        // ======================================
 
         if (scan.type === "reception") {
+
             ligne.reception = scan.dateAffichage;
+
+            // Le support réception remplace
+            // systématiquement celui d'expédition
+            if (scan.support) {
+                ligne.support = scan.support;
+            }
         }
 
+        // ======================================
+        // EXPÉDITION
+        // ======================================
+
         if (scan.type === "expedition") {
+
             ligne.expedition = scan.dateAffichage;
+
+            // Support expédition utilisé uniquement
+            // si aucune réception n'est disponible
+            if (ligne.reception === "-" && !ligne.support) {
+                ligne.support = scan.support;
+            }
         }
+
+        if (!ligne.interne && scan.interne) {
+            ligne.interne = scan.interne;
+        }
+
     });
 
     afficherResultats(
@@ -524,9 +570,6 @@ function afficherResultats(
         [
             ligne.bt,
             ligne.support,
-            ligne.interne,
-            ligne.reception,
-            ligne.expedition
         ].forEach(valeur => {
 
             const td = document.createElement("td");
